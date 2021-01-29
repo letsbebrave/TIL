@@ -1,3 +1,4 @@
+```
 public class OkJavaGoInHomeInput {
 	//args는 파라미터, 매개변수임
 	//args는 프로그램을 사용하는 사람과 프로그램 사이에 값을 매개해줌 
@@ -7,3 +8,4 @@ public class OkJavaGoInHomeInput {
 		String id = args[0]; //여러개의 파라미터(Run configurations)가 들어올 때
 		String bright = args[1];
 		
+```
