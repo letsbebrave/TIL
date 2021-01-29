@@ -1,0 +1,9 @@
+public class OkJavaGoInHomeInput {
+	//args는 파라미터, 매개변수임
+	//args는 프로그램을 사용하는 사람과 프로그램 사이에 값을 매개해줌 
+	//args로 arguments가 들어옴 (String[]는 문자열로만 이루어진 배열이란 뜻)
+	public static void main(String[] args) {
+		
+		String id = args[0]; //여러개의 파라미터(Run configurations)가 들어올 때
+		String bright = args[1];
+		
