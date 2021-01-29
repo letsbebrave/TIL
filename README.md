@@ -13,6 +13,6 @@ Today I Learned
 - 프로그래밍 언어별로 분류해서 작업한다.
 
 ## Java
-- 생활코딩
+- [Basic](https://github.com/letsbebrave/TIL/tree/main/Java)
 - 변수
 
