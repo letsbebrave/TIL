@@ -12,7 +12,7 @@ Today I Learned
 - 짧고 간결하며 핵심적인 문장을 사용한다. 필요한 설명이 있으면 관련된 정보가 포함된 외부 링크를 사용하자.
 - 프로그래밍 언어별로 분류해서 작업한다.
 
-## Java
-- [Basic](https://github.com/letsbebrave/TIL/tree/main/Java)
+## [Java](https://github.com/letsbebrave/TIL/tree/main/Java)
+- [Basic](https://github.com/letsbebrave/TIL/tree/main/Java/Basic)
 - 변수
 
