@@ -1,0 +1,35 @@
+import javax.swing.JOptionPane; //javax의 swing의 JOptionPane이란 클래스가 로드되었다.
+
+import org.opentutorials.iot.Elevator;
+import org.opentutorials.iot.Lighting;
+import org.opentutorials.iot.Security;
+import org.opentutorials.iot.DimmingLights;
+
+public class OkJavaGoInHomeInput {
+
+	public static void main(String[] args) {
+		
+		String id = JOptionPane.showInputDialog("Enter a ID"); //input값을 받는 창을 띄움 (프로그래밍 모르는 사람도 쉽게 접근 가능)
+		String bright = JOptionPane.showInputDialog("Enter a Bright level");
+		
+		// Elevator call
+		Elevator myElevator = new Elevator(id);
+		myElevator.callForUp(1);
+		
+		// Security off
+		Security mySecurity = new Security(id);
+		mySecurity.off();
+		
+		// Light on
+		Lighting hallLamp = new Lighting(id + " / Hall Lamp");
+		hallLamp.on();
+		
+		Lighting floorLamp = new Lighting(id + " / Hall Lamp");
+		floorLamp.on();
+		
+		DimmingLights moodLamp = new DimmingLights(id +" moodLamp");
+		moodLamp.setBright(Double.parseDouble(bright)); //String타입을 Double타입으로 바꾸어야
+		moodLamp.on();
+	}
+
+}
