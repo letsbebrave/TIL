@@ -18,7 +18,7 @@ public static void func(int k) {
     return;
  ```
  <br>
-- `Recursive case` :  
+- `Recursive case` :
  recursion을 반복하다보면 결국 base case로 수행해야 함 <br>
  
  ```
