@@ -6,7 +6,7 @@ void func(_)
   func(_);
   }
 ```
-<br>
+<br><br>
 **recursion이 항상 무한루프에 빠지는 건 아니다**<br>
 두 가지 조건 필요<br>
 - `Base case` : 
@@ -17,7 +17,7 @@ public static void func(int k) {
   if (k<=0)
     return;
  ```
- 
+<br><br> 
  - `Recursive case` :  
  recursion을 반복하다보면 결국 base case로 수행해야 함 <br>
  
@@ -29,8 +29,9 @@ public static void func(int k) {
  ```
 
 
-### 공부할만한 포인트 ###
-return 된다는 게 뭐인지 찾아보기
+### 공부할만한 포인트 ###<br>
+return 된다는 게 뭐지?
+
 ---
 ### Ref. ###
 혼자 공부하는 자바
