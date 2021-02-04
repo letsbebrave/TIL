@@ -17,7 +17,7 @@ public static void func(int k) {
   if (k<=0)
     return;
  ```
-<br><br> 
+<br>
  - `Recursive case` :  
  recursion을 반복하다보면 결국 base case로 수행해야 함 <br>
  
@@ -27,11 +27,11 @@ public static void func(int k) {
   func(k-1);
  }
  ```
+<br>
 
-
-### 공부할만한 포인트 ###<br>
+### 공부할만한 포인트 ###
 return 된다는 게 뭐지?
 
 ---
 ### Ref. ###
-혼자 공부하는 자바
+영리한 프로그래밍을 위한 알고리즘 강좌
