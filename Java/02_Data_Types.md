@@ -10,37 +10,37 @@ double fnum = 4.0
 ```
 
 - 기본 자료형(8)
-    1. byte 
+1. byte 
         - 데이터 처리 또는 문자의 최소 단위
         - 8개의 비트가 모여 하나의 바이트가 구성 됨
         - 기본값 : false
-    2. short
+2. short
         - 2 바이트 (16비트)
         - 정수형
         - 기본값 : 0
-    3. char
+3. char
         - 2 바이트 (16비트)
         - 문자
         - 기본값 : "\u0000"
-    4. int
+4.  int
         - **4 바이트**
         - **정수형의 기본 자료형** → 명시적으로 입력해주지 않았을 때 int 형태 따라감
         - 기본값 : 0
-    5. long
+5.  long
         - 8 바이트 → **long이랑 double만 8 바이트**
         - 0L
-    6. boolean
+6. boolean
         - 1 바이트
         - 데이터명이 보통 is~로 시작 → true/false 가 산출됨
 
             ex. isEmpty() 이면 boolean 데이터타입
 
         - 기본값 : False
-    7. float
+7. float
         - 4 바이트
         - 실수
         - 기본값 : 0.0f
-    8. double
+8. double
         - 8 바이트
         - **실수형의 기본 자료형**
         - 기본값 : 0.0
