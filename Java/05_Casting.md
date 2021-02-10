@@ -88,6 +88,7 @@
         int result4 = shortNum1 + shortNum2; //7
         ```
 <br><br>
+
     ### 다른 자료형끼리의 연산 using 자동 & 강제 형변환
 
     ```java
@@ -100,6 +101,7 @@
     long lsum = inum + lnum;
     ```
 <br><br>
+
     ### 형변환 사용 시 주의할 점
 
     데이터 손실에 유의해야 한다.<br>
