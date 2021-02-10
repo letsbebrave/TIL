@@ -89,14 +89,13 @@
         ```
 <br><br>
 ### 다른 자료형끼리의 연산 using 자동 & 강제 형변환 ###
-
-    ``` 
-    int inum = 10;
-    long lnum = 100;
-    int isum = (int) (inum + lnum);
-    int isum2 = inum + (int) lnum;  //무엇을 int로 형변환 함에 따라 연산 결과가 다르게 나올 수 있음
-    long lsum = inum + lnum;
-    ```
+```
+int inum = 10;
+long lnum = 100;
+int isum = (int) (inum + lnum);
+int isum2 = inum + (int) lnum;  //무엇을 int로 형변환 함에 따라 연산 결과가 다르게 나올 수 있음
+long lsum = inum + lnum;
+```
 <br><br>
 
 ### 형변환 사용 시 주의할 점 ###
