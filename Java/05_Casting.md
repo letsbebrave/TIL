@@ -103,7 +103,7 @@
 ### 형변환 사용 시 주의할 점 ###
 데이터 손실에 유의해야 한다.<br>
   - 의도하지 않은 데이터 손실<br>
-        ``` java
+        ```
         int inum = 290;
         byte bnum = (byte) inum;
         		
@@ -112,7 +112,7 @@
         ```
 
   - 의도한 데이터 손실<br>
-      ```java
+      ```
       double height = 178.4;
       int floorHeight = (int) height;
 
