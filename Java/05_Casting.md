@@ -101,19 +101,4 @@
 
 ### 형변환 사용 시 주의할 점 ###
 데이터 손실에 유의해야 한다.<br>
-  - 의도하지 않은 데이터 손실<br>
-        ```
-        int inum = 290;
-        byte bnum = (byte) inum;	
-        System.out.println("inum : " + inum); // 290
-        System.out.println("bnum : " + bnum); // 34 <- byte로 강제형변환되면서 오버플로우 일어남
-        ```
 
-  - 의도한 데이터 손실<br>
-      ```
-      double height = 178.4;
-      int floorHeight = (int) height;
-
-      System.out.println("height : " + height);  // 178.4
-      System.out.println("floorHeight : " + floorHeight);  //178
-      ```
