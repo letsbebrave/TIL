@@ -91,8 +91,7 @@
 
    ### 다른 자료형끼리의 연산 using 자동 & 강제 형변환 ###
 
-    ```
-    java
+    ``` java
     int inum = 10;
     long lnum = 100;
 
@@ -108,22 +107,19 @@
 
     데이터 손실에 유의해야 한다.<br>
 
-    1. 의도하지 않은 데이터 손실
+    1. 의도하지 않은 데이터 손실<br>
 
-        ```
-        java
+        ``` java
         int inum = 290;
         byte bnum = (byte) inum;
         		
         System.out.println("inum : " + inum); // 290
-        System.out.println("bnum : " + bnum); // 34 
-        																			// byte로 강제형변환되면서 오버플로우 일어남
+        System.out.println("bnum : " + bnum); // 34 <- byte로 강제형변환되면서 오버플로우 일어남
         ```
 
-    2. 의도한 데이터 손실
+    2. 의도한 데이터 손실<br>
 
-      ```
-      java
+      ```java
       double height = 178.4;
       int floorHeight = (int) height;
 
