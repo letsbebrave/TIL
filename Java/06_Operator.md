@@ -11,6 +11,7 @@ System.out.println("num1 * num2 = " + (num1 * num2));
 System.out.println("num1 / num2 = " + (num1 / num2));
 System.out.println("num1 % num2 = " + (num1 % num2));
 ```
+<br><br>
 
 ## 복합 대입 연산자
 
@@ -38,7 +39,7 @@ num *= 2;
 num =- 5;
 System.out.println("num : " + num);
 ```
-
+<br><br>
 ## 증감 연산자
 
 피연산자 값에 1을 더하거나 빼는 연산자로 위치에 따라 결과값 다름
@@ -70,7 +71,7 @@ System.out.println("num : " + num);	//21
 --num;	// 20(20)
 System.out.println("num : " + num);	//20
 ```
-
+<br><br>
 ### 퀴즈
 
 괄호 안에 다음 번에 호출하는 값 써줌 (esp. 후위 연산)
@@ -91,14 +92,14 @@ System.out.println((a++) + (--b) + (--c));
 ```
 
 - pdf 퀴즈
-
+<br><br>
 ## 비교 연산자
 
 - 데이터가 같은지, 다른지, 혹은 대소 비교를 할 때 사용
 - 항상 논리값(true, false)이 결과값
 - ‘==‘과 ‘!=‘은 모든 자료형에 사용 가능
 - >, >=, <, <=는 기본형 boolean과 참조형(String, 주소값)에 사용 불가능
-
+<br><br>
 ### 비교 연산자의 종류 (값이 달라짐)
 
 `==` : 왼쪽의 피연산자와 오른쪽의 피연산자가 같으면 true 다르면 false를 반환
@@ -110,9 +111,9 @@ System.out.println((a++) + (--b) + (--c));
 `>=` :  왼쪽의 피연산자가 오른쪽의 피연산자보다 크거나 같으면 true 아니면 false를 반환
 `<` :  왼쪽의 피연산자가 오른쪽의 피연산자보다 작으면 true 아니면 false를 반환
 `<=` :  왼쪽의 피연산자가 오른쪽의 피연산자보다 작거나 같으면 true 아니면 false를 반환
-
+<br><br>
 ### 1. 숫자값 비교 (정수, 실수 둘 다 해당됨)
-
+<br><br>
 ### 2. 문자값 비교
 
 유니코드의 정수형으로 비교 가능
@@ -124,7 +125,7 @@ char ch2 = 'A'; //65
 System.out.println("ch1과 ch2가 같지 않은지 비교 : " + (ch1 != ch2)); // true
 System.out.println("ch1과 ch2보다 큰지 비교 : " + (ch1 > ch2)); // true
 ```
-
+<br><br>
 ### 3. 논리값(boolean) 비교
 
 ==과 !=은 비교 가능하지만 대소비교(>, >=, <, <=)는 불가능
@@ -136,7 +137,7 @@ System.out.println("=========== 논리값 비교 ===========");
 System.out.println("bool1과 bool2가 같은지 비교 : " + (bool1 == bool2)); // false
 System.out.println("bool1과 bool2가 같지 않은지 비교 : " + (bool1 != bool2)) // true
 ```
-
+<br><br>
 ### 4. 문자열값(String) 비교
 
 문자열도 ==과 !=은 비교가 가능하지만 대소 비교는 불가능하다.
@@ -150,7 +151,7 @@ System.out.println("str1과 str2가 같지 않은지 비교 : " + (str1 != str2)
 ```
 
 여기까지 읽음
-
+<br><br>
 ## 논리 연산자
 
 ### 1. 논리 연결 연산자
@@ -170,7 +171,7 @@ int d = 40;
 System.out.println("a가 b보다 작으면서 c가 d보다 작은지 확인 : " + (a<b && c<d));
 // true
 ```
-
+<br><br>
 ### 2. 논리 부정 연산자
 
 `!` : 논리식의 결과가 참이면 거짓을, 거짓이면 참을 반환한다.
@@ -183,11 +184,11 @@ System.out.println("a가 b보다 작으면서 c가 d보다 작은지 확인 : " 
 System.out.println("true의 논리 not 연산 : " + (!true)); // false
 System.out.println("false의 논리 not 연산 : " + (!false));  // true
 ```
-
+<br><br>
 ## 연산자 종류와 우선순위
 
 - 연산자 종류와 우선순위.jpg
-
+<br><br>
 ### AND 연산과 OR 연산의 특징
 
 1. 논리식 && 논리식 : 앞의 결과가 false이면 뒤를 실행 안한다.
@@ -209,7 +210,7 @@ int num2 = 10;
 int result2 = (true || ++num2 >0)? num2 : num2;
 System.out.println("||실행 확인 : " + result2);
 ```
-
+<br><br>
 ## 삼항연산자
 
 `(조건식)? 참일 때 사용할 값1 : 거짓일 때 사용할 값2`
@@ -234,7 +235,7 @@ String result5 = (num5 > 0)? "양수다." : (num5 == 0)? "0이다" : "음수다.
 ```
 
 ---
-
+<br><br>
 ## 메소드
 
 기능의 역할
@@ -288,7 +289,7 @@ public class Application1 {
 ```
 
 ---
-
+<br><br>
 ## 디버깅
 
 `F5` : Step into - 해당 스텝의 상세보기 (더 들어가서 보는 것)
