@@ -12,13 +12,13 @@
     `반환값 타입` void : methodA()를 호출한 다음 어떤 것도 하지 않겠음 (값 반환 X, 출력O)
 
     `메소드 이름` methodA : methodA()로 되어 있음 메소드임
-
+<br><br>
 1. 객체 생성
 
 `클래스명 사용할이름 = new 클래스명();`
 
 `Application1 app1 = new Application1();` 
-
+<br><br>
 2. 메소드 호출
 
 `사용할 이름.메소드명();` 
@@ -38,7 +38,7 @@ app1.methodA();
 ```
 
  
-
+<br><br>
 - 메소드끼리 서로가 서로를 호출 가능
 
 `methodB();`
@@ -51,6 +51,7 @@ System.out.println("methodB() 호출함..");
 methodC();
 ```
 
+<br><br>
 ## 전달인자(argument)와 매개변수(parameter)
 
 - 전달인자
@@ -74,6 +75,7 @@ methodC();
     																			//상수 네이밍 규칙을 안 따라도 ok
     }
     ```
+<br><br>
 
 ### 변수의 종류
 
@@ -160,7 +162,7 @@ methodC();
     System.out.println("당신의 이름은 " + name + "이고, 나이는 " + age + "세이며, 성별은 " + gender + "입니다.");
     }
     ```
-
+<br><br>
 ## Return
 
 - 해당 메소드를 종료하고, 자신을 호출한 메소드로 복귀하는 예약어(함수)
@@ -193,7 +195,7 @@ public String testMethod() {
 				return "hello World";
 }
 ```
-
+<br><br>
 ## 매개변수와 리턴값 복합 활용
 
 숫자 두 개를 매개변수로 입력 받아 연산하는 메소드
@@ -217,13 +219,13 @@ public int plusTwoNumbers(int first, int second) {
 - String 형태로 리턴값 받는 경우
 
 - cf. Return
-
+<br><br>
 ## Static 메소드 호출
 
 public과 void 사이에 static이라는 키워드 사용 가능
 
 static 메소드와 non-static 메소드의 동작 흐름은 동일
-
+<br><br>
 1. static 메소드를 호출하는 방법
 
     `클래스명. 메소드명();`
@@ -262,7 +264,7 @@ static 메소드와 non-static 메소드의 동작 흐름은 동일
         static 메소드는 항상 상주하는 메소드이기 때문에 메모리를 잡아먹고, 
 
         non-static 메소드로 만들어 객체로 접근하게 되면 인스턴스가 가진 값으로 공유된 값에 예상치 못한 동작(ex. 오류)을 유발할 수 있기 때문에 사용을 제한
-
+<br><br>
 2. non-static 메소드를 호출하는 방법
 
     `클래스명 사용할이름 = new 클래스명();` 로 객체 생성하고
