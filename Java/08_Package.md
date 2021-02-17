@@ -68,5 +68,3 @@ public class Application2 {
     								//클래스명(Calculator) 생략가능
     		System.out.println("100과 200 중 더 큰 값은 : " + max2);
     ```
-
-- 클래스 이름이 같은데 패키지가 다른 경우 메소드를 호출할 때
