@@ -10,7 +10,6 @@ lang, util 패키지에 기본적인 메소드 많음
 
 [Java Platform SE 8](https://docs.oracle.com/javase/8/docs/api/)
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/789831c7-6e75-4fd6-b345-1c7e915fcfd9/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/789831c7-6e75-4fd6-b345-1c7e915fcfd9/Untitled.png)
 
 (왼쪽 열) 메소드 선언된 타입, 리턴값의 형식
 
