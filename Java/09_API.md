@@ -248,6 +248,7 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
     `nextBoolean();` 입력받은 값을 boolean형으로 반환
 
     true, false 이외에 다른 값 입력 시 InputMismatchException 발생
+    <br>
 
     ```java
     System.out.println("참과 거짓 중에 한 가지를 true or false로 입력해주세요 : ");
@@ -279,8 +280,8 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
 <br> <br>
 
      3 - 2. 정수, 실수, 논리값 입력 후 `nextLine( )`으로 문자열 입력 받을 때
-     `nextInt()` 와 `nextLine()` 사이에 `sc.nextLine()` 입력
-
+     `nextInt()` 와 `nextLine()` 사이에 `sc.nextLine()` 입력 <br>
+     
 	```java
 	System.out.print("다시 숫자를 입력해주세요 : ");
 	int num2 = sc.nextInt();
