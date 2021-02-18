@@ -242,7 +242,6 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
         System.out.println("입력하신 실수는 " + number + "입니다.");
         ```
 <br> <br>
-
     2 - 5. 논리형 값 입력받기
 
     `nextBoolean();` 입력받은 값을 boolean형으로 반환
@@ -278,9 +277,11 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
     System.out.println("num1 : " + num1);
     ```
 <br> <br>
-
      3 - 2. 정수, 실수, 논리값 입력 후 `nextLine( )`으로 문자열 입력 받을 때
-     `nextInt()` 와 `nextLine()` 사이에 `sc.nextLine()` 입력 <br>
+
+    `nextInt()` 와 `nextLine()` 사이에 `sc.nextLine()` 입력
+   
+
      
 	```java
 	System.out.print("다시 숫자를 입력해주세요 : ");
