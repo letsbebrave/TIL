@@ -10,7 +10,6 @@ lang, util 패키지에 기본적인 메소드 많음
 
 [Java Platform SE 8](https://docs.oracle.com/javase/8/docs/api/)
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/789831c7-6e75-4fd6-b345-1c7e915fcfd9/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/789831c7-6e75-4fd6-b345-1c7e915fcfd9/Untitled.png)
 
 (왼쪽 열) 메소드 선언된 타입, 리턴값의 형식
 
@@ -43,7 +42,7 @@ System.out.println("원주율 : " + Math.PI);
 ```
 
 - cf.  Math클래스의 abs가 static 메소드가 아닐 경우
-
+<br> <br>
 ### 난수 발생
 
 1. java.lang.Math.random( );
@@ -66,13 +65,13 @@ util 패키지의 Random 클래스의 nextInt( ) 메소드 이용
 `nextInt(int bound)` : 0부터 매개변수로 전달받은 정수 범위까지의 난수를 정수 형태로 반환
 
 non-static 메소드이므로 객체 선언이 필요함
-
+<br> <br>
 ### 난수의 활용
 
 Math.random()을 이용해 발생한 난수는 0부터 1전까지의 실수 범위의 실수값 반환
 
 정수 형태의 값을 원하는 범위 만큼 발생시키는 경우
-
+<br> <br>
 ### 원하는 범위의 난수를 구하는 공식
 
 1. java.lang.Math.random( );
@@ -132,7 +131,7 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
 ```
 
 ---
-
+<br> <br>
 ## Scanner
 
 `java.util 패키지에 Scanner 클래스(non-static)가 있다`
@@ -282,18 +281,17 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
     System.out.println("num1 : " + num1);
     ```
 
-3 - 2. 정수, 실수, 논리값 입력 후 `nextLine( )`으로 문자열 입력 받을 때
+     3 - 2. 정수, 실수, 논리값 입력 후 `nextLine( )`으로 문자열 입력 받을 때
+     `nextInt()` 와 `nextLine()` 사이에 `sc.nextLine()` 입력
 
-`nextInt()` 와 `nextLine()` 사이에 `sc.nextLine()` 입력
+	```java
+	System.out.print("다시 숫자를 입력해주세요 : ");
+	int num2 = sc.nextInt();
+	System.out.println("num2 : " + num2);
 
-```java
-System.out.print("다시 숫자를 입력해주세요 : ");
-int num2 = sc.nextInt();
-System.out.println("num2 : " + num2);
-		
-sc.nextLine();
-		
-System.out.print("공백이 있는 문자열을 하나 입력해주세요 : ");
-String str2 = sc.nextLine();
-System.out.println("str2 : " + str2);
-```
+	sc.nextLine();
+
+	System.out.print("공백이 있는 문자열을 하나 입력해주세요 : ");
+	String str2 = sc.nextLine();
+	System.out.println("str2 : " + str2);
+	```
