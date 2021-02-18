@@ -9,11 +9,7 @@
 lang, util 패키지에 기본적인 메소드 많음
 
 [Java Platform SE 8](https://docs.oracle.com/javase/8/docs/api/)
-
-
-(왼쪽 열) 메소드 선언된 타입, 리턴값의 형식
-
-(오른쪽 열) 메소드명, 매개변수
+<br> <br>
 
 ex. lang 패키지의 Math 클래스의 abs 메소드 이용
 
@@ -102,6 +98,7 @@ System.out.println("10 부터 15 사이의 난수 : " + random3);
 int random4 = (int) (Math.random() * 256) -128;
 System.out.println("-128 부터 127까지의 난수 발생 : " + random4);
 ```
+<br> <br>
 
 2. java.util.Random.nextInt( int bound );
 
@@ -151,6 +148,7 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
     ⇒ 화면에서 정수형, 소수형과 같은 데이터 타입 입력받으려면 [System.in](http://system.in) 사용
 
     (Byte 단위로 읽고 자바의 표준입력스트림임)
+<br> <br>
 
 2. Scanner 객체 사용
 
@@ -189,6 +187,7 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
     String greeting2 = sc.next(); // 안녕하세요 반갑습니다.
     System.out.println(greeting2); // 안녕하세요 (공백 제외하기 때문에 "반갑습니다." X)
     ```
+<br> <br>
 
     2 -2. 문자형 값 입력받기
 
@@ -204,6 +203,7 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
     char ch = sc.nextLine().charAt(0);		//입력받음 문자열 중에 내가 원하는 위치
     System.out.println("입력하신 문자는 " + ch + "입니다.");
     ```
+<br> <br>
 
     2 - 3. 정수형 값 입력받기
 
@@ -226,6 +226,7 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
         long money = sc.nextLong();
         System.out.println("입력하신 금액은 " + money + " 원입니다.");
         ```
+<br> <br>
 
     2 - 4. 실수형 값 입력받기
 
@@ -248,6 +249,7 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
         double number = sc.nextDouble();
         System.out.println("입력하신 실수는 " + number + "입니다.");
         ```
+<br> <br>
 
     2 - 5. 논리형 값 입력받기
 
@@ -260,10 +262,12 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
     boolean isTrue = sc.nextBoolean();
     System.out.println("입력하신 논리값은 " + isTrue + "입니다.");
     ```
+<br> <br>
 
 3. Scanner 주의사항
 
     문자열을 받는 `next( ), nextLine()`은 입력한 내용을 버퍼로부터 토큰단위로 분리해서 읽어옴
+<br> <br>
 
     3 - 1. `next()`로 문자열 입력 받은 후 정수, 실수, 논리값 입력 받을 때
 
@@ -280,6 +284,7 @@ System.out.println("-128 부터 127까지의 난수 : " + randomNumber4);
     int num1 = sc.nextInt();
     System.out.println("num1 : " + num1);
     ```
+<br> <br>
 
      3 - 2. 정수, 실수, 논리값 입력 후 `nextLine( )`으로 문자열 입력 받을 때
      `nextInt()` 와 `nextLine()` 사이에 `sc.nextLine()` 입력
