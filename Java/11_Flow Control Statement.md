@@ -82,13 +82,6 @@ if(product.equals("사과") || product.equals("바나나") || product.equals("�
 //따라서 equals()메소드로 안에 있는 값으로 비교해주어야
 ```
 
-## 조건문 퀴즈
-
-- hard - Application02
-
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/211e6382-3feb-4922-a40a-02b0a83e4ee8/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/211e6382-3feb-4922-a40a-02b0a83e4ee8/Untitled.png)
-
-product(나는 name) 변수를 한 번만 쓸 거면 위처럼 써주면 된다.
 
 ---
 
@@ -123,9 +116,8 @@ for (int i = 1; i <= 10; i++) {
 		System.out.println("10명의 학생 이름을 입력받고 출력하는 기능을 완료했습니다.");
 ```
     
-## 반복문
 
-# While문
+## While문
 
 몇 번 반복되는지 모르고 While문 안의 조건식을 true 값으로 만들어 놓은 다음,
 
