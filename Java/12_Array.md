@@ -224,3 +224,117 @@ iarr2[0] = new int[5];
 iarr2[1] = new int[7];
 iarr2[2] = new int[4];
 ```
+
+# 배열의 복사
+
+**`얕은 복사`**와 **`깊은 복사`**가 있음
+
+언제 사용하는 건지 중요
+
+1. 얕은 복사 → 동일객체(주소값이 같음)
+
+    Stack에 있는 배열의 주소값 하나를 여러 배열변수가 공유
+
+    heap에 있는 기존의 배열을 참조
+
+    ⇒ 두 개의 참조변수(arr1, arr2)는 동일한 배열의 주소값을 가짐
+
+    ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9b9185f7-170b-4ed4-a789-4abfffa0effd/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9b9185f7-170b-4ed4-a789-4abfffa0effd/Untitled.png)
+
+    얕은 복사는 stack에 저장되어 있는 배열의 주소값만 복사
+    따라서, 두 개의 참조변수(arr1, arr2)는 동일한 배열의 주소값을 가짐
+
+    ```java
+    int[] originArr = {1,2,3,4,5};
+    int[] copyArr = originArr;
+    // 동일한 주소를 가진 동일 객체를 참조하고 있음
+
+    // hashcode를 출력해보면 두 개의 참조 변수는 동일한 주소값을 가지고 있다.
+    		System.out.println(originArr.hashCode());
+    		System.out.println(copyArr.hashCode());
+    ```
+
+    cf. 근데 int[] arr2는 객체를 새로 형성한 게 아니고 선언만 해준 건데 "객체"라고 할 수 있나? 
+
+    - 기존에 있던 객체를 참조 받고 있기 때문에 동일"객체"임
+
+    - 얕은 복사의 활용
+
+        1. 메소드 호출 시 인자로 사용하는 경우  
+
+        2. 리턴값으로 동일한 배열을 리턴해주고 싶은 경우
+
+        ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2eaa44fa-930c-420d-89ef-e3e0d175ff65/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2eaa44fa-930c-420d-89ef-e3e0d175ff65/Untitled.png)
+
+        메소드 호출 시
+
+        iarr의 주소값을 호출된 곳으로 리턴
+
+        iarr의 주소값을 매개변수로 전달해줌
+
+        둘 다 실제값이 아니라 동일한 주소값을 참조하는 것 → 얕은 복사
+
+        - 배열을 매개변수로 받는 경우 참고 사이트
+
+2. 깊은 복사 → 동등객체(타입과 값이 모두 같아야)
+
+heap의 배열에 저장된 값을 복사해서 배열을 늘리거나 줄이고 싶을 때
+
+새로운 배열에 배열 변수들을 복사
+
+새 배열의 주소값을 이전에 있던 배열변수 `arr1`에 덮어줌
+
+⇒ 기존 배열과 값은 같지만 주소값이 다름 (서로 다른 배열)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2e7bee48-8490-42c9-a795-3ea2995cb09f/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2e7bee48-8490-42c9-a795-3ea2995cb09f/Untitled.png)
+
+- 깊은 복사 하는 방법 (4가지)
+    1. for문을 이용해 동일한 인덱스의 값을 복사
+
+        ```java
+        int[] originArr = new int[] {1,2,3,4,5};	
+        print(originArr); // 원본배열
+
+        int[] copyArr1 = new int[10];
+        		
+        		for(int i = 0; i < originArr.length; i++) {
+        			copyArr1[i] = originArr[i];
+        		}
+        	
+        print(copyArr1); //1 2 3 4 5 0 0 0 0 0 
+        ```
+
+    2. Object클래스의 clone()메소드를 이용한 복사
+
+        동일한 길이, 값을 가지는 배열이 생성 but 주소는 다름
+
+        배열의 길이를 마음대로 조정하지 못하는 유일한 방법
+
+        ```java
+        int[] copyArr2 = originArr.clone();
+        print(copyArr2); // 1 2 3 4 5
+        ```
+
+    3. System클래스의 arraycopy()메소드를 이용한 복사
+
+        가장 높은 성능 (only for 배열)
+
+        ```java
+        int[] copyArr3 = new int[10];
+        System.arraycopy(originArr, 0, copyArr3, 3, 5);
+        							//원본배열 ,복사를 시작할 인덱스,
+                      //복사본배열,복사본 배열에 넣기 시작할 인덱스 넘버,복사할 길이
+
+        print(copyArr3); // 0 0 0 1 2 3 4 5 0 0
+        ```
+
+    4. Arrays의 copyOf()를 이용한 복사
+
+        가장 많이 사용되는 방식(유연)
+
+        ```java
+        int[] copyArr4 = Arrays.copyOf(originArr, 7);
+                                    //복사할 원본, 복사할 길이
+
+        print(copyArr4); // 1 2 3 4 5 0 0
+        ```
