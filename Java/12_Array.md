@@ -73,7 +73,7 @@ cf. new 연산자 : new 연산자는 heap 영역에 공간을 할당하고 발�
 `System.out.println("삭제 후 darr의 길이 : " + darr.length);`
 
 `NullPointerException` 발생 -> 길 잃은 곳에서 어떻게 갈 지 찾는 것
-
+<br><br>
 ## 배열의 저장구조
 
 
@@ -110,8 +110,9 @@ cf. new 연산자 : new 연산자는 heap 영역에 공간을 할당하고 발�
     heap에는 값이 없는 상태로 못 들어감. 없으면 초기값이라도 자동으로 넣어짐 (int 형 배열이면 0이 채워짐)
 
     - 값의 형태별 기본값
+    - 
 - Static
-
+<br><br>
 ## 배열의 선언
 
 자료형[] 변수명; (변수명 = 배열명)
@@ -129,7 +130,7 @@ arr도 Heap에 만들어진 값을 Stack이 참조해서 쓰고 있는 것.
 like String이 참조형 변수인 것 처럼
 
 배열도 Heap 영역에 방을 만들고 Stack이 참조해서 쓰는 것.
-
+<br><br>
 ## 블럭
 
 자바에서 지정한 기본값 외의 값으로 초기화를 하고 싶은 경우 블럭을 사용
@@ -160,7 +161,7 @@ int[] iarr3 = new int[] { 11, 22, 33, 44, 55 };
 			System.out.println("iarr3[" + i + "]의 값 : " + sarr[i]);
 		}
 ```
-
+<br><br>
 ## hashcode()
 
 Object의 hashCode() 메소드는 
@@ -188,7 +189,7 @@ System.out.println("carr의 hashcode : " + carr2.hashCode());
 //iarr의 hashcode : 971848845
 //carr의 hashcode : 1910163204
 ```
-
+<br><br>
 ## 다차원 배열
 
 - 다차원 배열은 2차원 이상의 배열을 의미
@@ -224,7 +225,94 @@ iarr2[0] = new int[5];
 iarr2[1] = new int[7];
 iarr2[2] = new int[4];
 ```
+2. 가변배열
 
+선언과 동시에 모든 배열 할당 불가능
+
+할당할 행의 배열의 갯수만 지정 → 각 인덱스 별 배열을 따로 할당 
+
+```java
+자료형[][] 변수명 = new 자료형[할당할 행의 배열의 갯수][];
+변수명[행의 배열 인덱스] = new 자료형[열 배열의 길이];
+
+int[][] iarr = new int[3][];
+iarr[0] = new int[3];
+iarr[1] = new int[2];
+iarr[2] = new int[5];
+```
+
+```java
+//헷갈릴만한 케이스(둘은 동일)
+int[][] iarr = new int[3][];
+iarr[2] = new int[5];
+
+//미리 할당해둔 배열의 주소값을 이용해서
+//행에 배열 형성 가능
+int[] arr = new int[5]; 
+iarr[2] = arr; //arr엔 int 형태의 배열의 주소값이 있음
+```
+
+## 반복문을 이용한 값 대입 및 출력
+
+```java
+iarr[0] = new int[3];
+iarr[1] = new int[2];
+iarr[2] = new int[5];
+
+// 반복문을 이용한 값 대입
+int value = 0;	
+for(int i = 0; i < iarr.length; i++) {
+		for(int j = 0; j < iarr[i].length; j++) {
+			iarr[i][j] = ++value;
+		}
+	}
+	
+// 반복문을 이용한 값 출력
+	for(int i = 0; i < iarr.length; i++) {
+		for(int j = 0; j <iarr[i].length; j++) {
+			
+			System.out.print(iarr[i][j] + " ");
+		}
+		System.out.println();
+```
+
+## ArrayIndexOutOfBoundsException
+
+존재하지 않는 인덱스에 접근하거나
+
+존재하지 않는 배열에 접근하는 경우
+
+```java
+int[][] iarr = new int[3][];
+iarr[0] = new int[3];
+iarr[1] = new int[2];
+iarr[2] = new int[5];
+
+iarr[0][3] = 4;  
+// "존재하지 않는 인덱스"에 접근하는 경우 ArrayIndexOutOfBoundsException이 발생
+iarr[3][0] = 11;  
+// "존재하지 않는 배열"에 접근하는 경우 ArrayIndexOutOfBoundsException이 발생
+```
+
+## 리터럴을 통한 2차원 배열 값 대입
+
+1. 정변배열
+
+    ```java
+    int[][] iarr = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}, {11, 12, 13, 14, 15}};
+    ```
+
+2. 가변배열
+
+    ```java
+    int[][] iarr2 = {{1,2,3},{4,5,6,7},{8,9,10,11,12}};
+
+    // 미리 할당한 배열을 이용한 방식 (동일)
+    int[] arr1 = {1,2,3,4,5};
+    int[] arr2 = {6,7,8,9,10};
+
+    int[][] iarr3 = {arr1, arr2}; //행에 배열을 넣어준 것
+    ```
 # 배열의 복사
 
 **`얕은 복사`**와 **`깊은 복사`**가 있음
@@ -238,8 +326,6 @@ iarr2[2] = new int[4];
     heap에 있는 기존의 배열을 참조
 
     ⇒ 두 개의 참조변수(arr1, arr2)는 동일한 배열의 주소값을 가짐
-
-    ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9b9185f7-170b-4ed4-a789-4abfffa0effd/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9b9185f7-170b-4ed4-a789-4abfffa0effd/Untitled.png)
 
     얕은 복사는 stack에 저장되어 있는 배열의 주소값만 복사
     따라서, 두 개의 참조변수(arr1, arr2)는 동일한 배열의 주소값을 가짐
@@ -264,7 +350,6 @@ iarr2[2] = new int[4];
 
         2. 리턴값으로 동일한 배열을 리턴해주고 싶은 경우
 
-        ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2eaa44fa-930c-420d-89ef-e3e0d175ff65/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2eaa44fa-930c-420d-89ef-e3e0d175ff65/Untitled.png)
 
         메소드 호출 시
 
@@ -285,8 +370,6 @@ heap의 배열에 저장된 값을 복사해서 배열을 늘리거나 줄이고
 새 배열의 주소값을 이전에 있던 배열변수 `arr1`에 덮어줌
 
 ⇒ 기존 배열과 값은 같지만 주소값이 다름 (서로 다른 배열)
-
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2e7bee48-8490-42c9-a795-3ea2995cb09f/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2e7bee48-8490-42c9-a795-3ea2995cb09f/Untitled.png)
 
 - 깊은 복사 하는 방법 (4가지)
     1. for문을 이용해 동일한 인덱스의 값을 복사
