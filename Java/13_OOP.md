@@ -412,3 +412,436 @@ public static void main(String[] args) {
 
 }
 ```
+
+### 생성자의 사용목적
+
+1. 객체 생성 시점에 수행할 명령이 있는 경우 (다른 곳에 있는 것 갖다 쓸 수 있게 명령문 추가 가능)
+2. 매개변수로 전달받은 값으로 필드를 초기화(필드에 값을 넣음)하여 객체 생성 가능
+3. 작성한 생성자 외에 객체를 생성하는 방법을 제공하지 않는다는 의미를 가진다. 
+
+→ 값이 필요한 부분이 있으면 매개변수 부분에 무조건 넣어줘야
+→ 인스턴스를 생성하는 방법을 제한하기 위한 용도로 사용할 수 있음
+
+++ 초기값 전달 강제화
+
+### 생성자 작성방법
+
+```java
+[표현식]
+ 접근제한자 클래스명(매개변수) { // 기본생성자는 반환값 타입 지정 안 함. -> 기본생성자이기 때문
+ 		인스턴스 생성 시점에 수행할 명령 기술(주로 필드를 초기화)
+ 		this.필드명 = 매개변수;
+```
+
+### 기본생성자
+
+- 생성자 함수에 매개변수가 없는 생성자
+- 자료형별 초기값으로 필드를 초기화
+
+    객체가 new 연산자를 통해 Heap 메모리 영역에 할당될 때 1회성으로 호출되는 리턴타입이 없는 메소드이므로 필드는 초기값이라도 무조건 가져야 함
+
+- compiler에서 자동으로 추가됨
+
+    but, 클래스에 `매개변수가 있는 생성자`가 하나라도 있는 경우
+
+    기본생성자가 추가되지 않음 → 직접 기본생성자를 클래스에 써줘야 함
+
+- 필드선언부와 메소드선언부 사이에 작성
+
+### 매개변수가 있는 생성자
+
+- 필드의 초기값을 사용자가 원하는 대로 설정하고 싶은 경우
+
+    생성자의 호출 시 **인자로 값을 전달**하여 호출 가능
+
+- 인자를 받아 필드를 초기화(필드에 값을 대입) 할 목적
+- 객체를 필드를 초기화할 매개변수의 갯수에 따라 모두 만들어둬야 함
+
+```java
+
+// 다른 패키지에 존재하는 클래스 사용 시 패키지명을 포함한 클래스 이름을 사용
+// 임포트
+// cf. 클래스명 앞에 패키지명을 추가하지 않은 경우는 같은 패키지에 있기 때문
+
+// -> java.util 패키지의 Date클래스를 이용하려면 패키지명을 추가해주어야
+// Date클래스는 non-static 인스턴스라서 new?
+
+User user3 = new User("user02","pass02","이순신", new java.util.Date());
+System.out.println(user3.getInformation());
+
+----
+public class User {
+
+private Date enrollDate;
+// 필드로 사용자 정의형 데이터 타입인 "클래스"도 사용 가능
+// 기본자료형 말고도 클래스 타입의 필드도 사용 가능
+
+public User(String id, String pwd, String name, java.util.Date enrollDate) {
+		this(id, pwd, name);
+		//this()메소드를 통해 "this.id = id; this.pwd = pwd;, this.name = name;"을 줄여줌
+		//맨 첫 줄에 선언해야함
+		this.enrollDate = enrollDate;
+		syso("User 클래스의 모든 필드를 초기화하는 생성자 호출함..")
+}
+
+public String getInformation() {
+		return "Id = " + this.id + ", pwd = " + this.pwd + ", name = " + this.name + ", enrollDate = " + this.enrollDate;
+	}
+```
+
+### 복사생성자를 호출하는 경우
+
+얕은 복사 vs. 깊은 복사
+
+- [Array](https://www.notion.so/Array-1c757d8f5bbc45499d47db967226cf12)
+
+```java
+User user4 = new User(user3);		
+//user3 객체의 주소값을 매개변수로 넣어줌
+//user4를 만들 때 생성자의 매개변수로 user3 객체의 주소값을 넣어준 것
+//참조변수 user4의 값이 user3의 값과 동일하다는 뜻이 아님(둘다 heap에 생성되는 객체의 주소값을 가짐)
+
+System.out.println(user4.getInformation());
+
+// User 클래스의 다른 객체를 매개변수로 갖고 와서 새로운 인스턴스에
+// 동일한 값으로 초기화해줌
+// 이미 만들어진 동일한 타입의 인스턴스가 가지는 필드값을 이용해서 새로운 인스턴스 생성시 초기화값으로 이용
+// --> 깊은 복사(다른 인스턴스인데 그 안의 필드값만 동일)
+
+public User(User otherUser) { //user3 객체의 주소값 입력 시
+		this.id = otherUser.id;	  //this.id = user3.id;
+		this.pwd = otherUser.pwd;
+		this.name = otherUser.id;
+		this.enrollDate = otherUser.enrollDate;
+		
+		System.out.println("User 클래스의 복사생성자 호출함..");
+		System.out.println("this의 hashcode : " + this.hashCode());
+		System.out.println("otherUser의 hashcode : " + otherUser.hashCode());
+		// hashcode가 다름
+	}
+
+---------------------------------------
+
+//cf. 얕은복사 경우
+User user5 = user3;
+// 동일한 주소값을 가지므로 얕은 복사임
+// 참조변수 user5 에 user3 객체의 주소값을 대입했으므로 동일한 주소값 가짐
+System.out.println("user5의 hashcode : " + user5.hashCode());
+```
+
+추가 설명
+
+[`this.id`](http://this.id) 와 `user.id`가 가진 주소값 동일
+
+`this.hashCode()`는 `user.hashCode()`와 동일
+
+객체가 만들어질 때 당시에 만들어진 것 this 주소값을 담고 있는 변수
+
+- 깊은복사 vs. 얕은 복사
+- 깊은복사 vs. 얕은복사 in 배열
+
+## 객체 형성 시 생성자 vs. 설정자(setter)를 이용한 초기화
+
+1. 생성자를 이용한 초기화
+
+    `User user2 = new User("user01","pass01","홍길동");`
+
+    장점 : 매개변수를 이용해서 단 한번의 호출로 인스턴스를 생성 및 초기화 가능
+
+    단점 : 생성자를 매개변수의 갯수에 따라 모든 경우의 수로 만들어야 (객체를 여러번 만듦), 호출 시 인자가 많을 때 어떤 값이 어떤 필드 의미하는지 보기 어려움
+
+2. 설정자(setter)를 이용한 초기화
+
+`member.setName("홍길동");`
+
+장점 : 개별 필드마다 하나씩 초기화해주므로 필드 초기화하는 각각의 값이 어떤 필들르 초기화하는지 볼 수 있음 (5개 필드값은 5개 setter를 통해 필드에 넣어줌)
+
+단점 : 하나의 인스턴스 생성 시 여러 번 호출해줘야
+
+cf. 변수 초기화 시, 매개변수 있는 생성자는 순서, 타입, 갯수 일치해야.
+
+but setter는 순서 상관 X
+
+```java
+		/* 생성자를 이용한 초기화 */
+		UserVO user1 = new UserVO("greedy","pass01","해인",new java.util.Date()); //여기에 매개변수를 넣어줘야 함. 아래의 getInformation 메소드엔 전달인자를 받아줄 매개변수가 선언되어 있지 않다.
+		System.out.println(user1.getInformation());
+		
+		/* 기본생성자와 설정자를 이용한 초기화 */
+		
+		UserVO user2 = new UserVO();
+		user2.setId("greedy");
+		user2.setPwd("pass01");
+		user2.setName("해인");
+		user2.setEnrollDate(new java.util.Date());
+		
+		System.out.println(user2.getInformation());
+```
+
+## 자바빈(Java Bean)
+
+JSP에서 배우게 될 표준 액션 태그로 접근할 수 있는 자바 클래스
+
+웹 퍼블리셔들도 자바 코드를 사용할 수 있도록 태그 형식으로 지원하는 문법
+
+그 때 사용할 수 있도록 규칙을 지정해놓은 java 클래스 == `자바빈`
+
+- 자바빈 작성 규칙
+
+    1. 자바빈은 특정 패키지에 속해있어야 한다.
+
+    2. 멤버변수(필드)의 접근제어자는 private로 선언해야 한다.
+
+    3. 기본생성자가 명시적으로 존재해야 한다. (매개변수가 있는 생성자는 선택사항)
+
+    4. 멤버변수에 접근 가능한 설정자(setter)와 접근자(getter)가 public으로 작성돼야
+
+    - 다른 클래스가 필드엔 접근이 안되므로 우회적인 방법(메소드)을 통해 값을 필드에 넣어주고 필드에서 값을 빼줘야 함
+
+    5. 직렬화(Serializable구현)가 되어야 한다. (선택사항)
+
+# 오버로딩(Overloading)
+
+동일한 이름의 생성자나 메소드를 한 클래스 내에서 작성하는 것은 불가능
+
+but,
+
+매개변수의 선언부에 작성한 **매개변수의 타입, 갯수, 순서(메소드의 시그니처)**에 따라 
+
+동일한 이름의 생성자
+
+혹은 메소드를 한 클래스 내에 여러 개 작성 가능 == `오버로딩`
+
+cf.0
+
+메소드의 `시그니처` 란 `public void method(int num){}` 에서 `int num` 부분
+
+접근제한자는 메소드 시그니처에 해당 X
+
+→  접근제한자가 다르다고 해서 다른 메소드로 쳐주지 않음
+
+ex. `public void test() {}` 와 `private void test() {}` 는 한 클래스 내에 작성 X
+
+cf.1
+
+매개변수의 변수명이 달라도 매개변수의 타입, 갯수, 순서가 같다면 동일한 메소드임
+
+(변수명은 상관이 없음)
+
+매개변수의 타입, 갯수, 순서 중 하나만 달라도 다른 메소드 or 생성자임
+
+cf.2
+
+오버로딩의 예시 : `printfln()` 메소드
+
+매개변수의 데이터 타입이 다 다르지만, 하나의 메소드명 `println` 으로 출력 가능
+
+### 오버로딩을 사용하는 이유
+
+다양한 종류의 매개변수에 따라 다르게 처리해야 하는 여러 메소드들을 `동일한 이름`으로 관리하기 위해 사용
+
+### 오버로딩의 조건
+
+동일한 이름을 가진 메소드 파라미터 선언부에 
+
+매개변수의 타입, 갯수, 순서를 다르게 작성
+
+→ 메소드의 시그니처가 달라야 다른 메소드로 인식하기 때문
+
+```java
+public void test() {}
+	
+	//public void test() {} // 시그니처 가 동일한 경우 Compile Error를 발생시킨다.
+	
+	/* 접근제한자에 따른 오버로딩 성립 확인 */
+	//private void test() {} //에러발생. Why? 접근제한자는 메소드 시그니처에 해당 X = 접근제한자가 다르다고 해서 다른 메소드로 쳐주지 않음
+	
+	/* 반환형에 따른 오버로딩 성립 확인 */
+	//public int test() { return 0; } //에러발생. Why? 반환형은 메소드 시그니처에 해당 X
+	
+	/* 매개변수 유무에 따른 오버로딩 성립 확인 */ 
+	public void test(int num) {} //파라미터 선언부는 메소드 시그니처에 해당
+	
+	//public void test(int num2) {} //에러발생. Why? 매개변수의 이름은 시그니처에 영향을 주지 않음
+	
+	/* 매개변수 갯수에 따른 오버로딩 성립 확인 */
+	public void test(int num1, int num2) {}
+	
+	/* 매개변수 타입 변화에 따른 오버로딩 성립 확인 */
+	public void test(int num, String name) {}
+	
+	/* 매개변수의 순서에 따른 오버로딩 성립 확인 */
+	public void test(String name, int num) {}
+```
+
+## 매개변수(parameter)로 사용가능한 자료형
+
+1. 기본자료형
+
+    기본자료형은 인자로 전달하는 값의 자료형과 매개변수로 전달하는 값의 자료형이 동일
+
+2. 기본자료형 배열
+
+    ```java
+    int[] iarr = new int[] {1,2,3,4,5};
+    		System.out.println("인자로 전달하는 값 : " + iarr);
+    		pt.testPrimaryTypeArrayParameter(iarr);
+
+    ------
+    public void testPrimaryTypeArrayParameter(int[] iarr) {
+    //배열의 주소가 전달됨
+    //즉 인자로 전달하는 배열과 매개변수로 전달받은 배열은 서로 동일한 배열을 가리킴(얕은 복사)
+    System.out.println("매개변수로 전달받은 주소값 : " + iarr);
+
+    /* 배열의 0번째 인덱스에 값 변경 */		
+    iarr[0] = 99;
+
+    System.out.print("변경 후 배열의 값 출력 : ");
+    		for(int i = 0; i < iarr.length; i++) {
+    			System.out.print(iarr[i] + " ");
+    		}
+    		System.out.println();
+    }
+    ```
+
+3. 클래스자료형
+
+클래스는 내가 만든 데이터 타입(사용자 정의형)으로, 넣어주는 매개변수에 따라 메소드를 통해 값을 필드에 넣어주거나 여러 계산을 해서 리턴 받을 수 있다.
+
+```java
+ParameterTest pt = new ParameterTest();
+
+RectAngle r1 = new RectAngle(12.5, 22.5);
+System.out.println("인자로 전달하는 값 : " + r1);
+
+pt.testClassTypeParameter(r1);
+------------
+public class ParameterTest {
+public void testClassTypeParameter(RectAngle rectAngle) { //클래스 RectAngle의 참조변수(객체,인스턴스) r1이 들어감
+		
+		/*
+		 * 인스턴스도 주소가 전달된다.
+		 * 즉, 인자로 전달하는 인스턴스와 매개변수로 전달받은 인스턴스는 *서로 동일한 인스턴스를 가리킨다*. (얕은복사)
+		 */
+		System.out.println("매개변수로 전달받은 값 : "  + rectAngle);
+		
+		/* 사각형의 넓이와 둘레 출력 */
+		System.out.println("변경 전 사각형의 넓이와 둘레 ===============");
+		rectAngle.calcArea();		//r1.calcArea(); 매개변수가 따로 없음. 기존에 r1 생성 시 입력한 필드값이 전역변수로서 그대로 사용됨.
+		rectAngle.calcRound();
+		
+		/* 사각형의 너비와 높이를 변경 by setter */
+		rectAngle.setWidth(100);	// 자동형변환 적용됨 // 클래스의 실제값 접근엔 . 참조연산자가 사용됨
+		rectAngle.setHeight(100);  
+		
+		/* 사각형의 넓이와 둘레 출력 */
+		System.out.println("변경 후 사각형의 넓이와 둘레 ===============");
+		rectAngle.calcArea();
+		rectAngle.calcRound();
+		
+		
+		
+	}
+}
+-------
+public class RectAngle {
+	private double width;
+	private double height;
+
+public RectAngle(double width, double height) {
+		this.width = width;
+		this.height = height;
+	}
+
+	public double getWidth() {
+		return width;
+	}
+
+	public void setWidth(double width) { // int형으로 width 전달인자를 넣어줘도 double형으로 자동형변환
+		this.width = width;
+	}
+
+	public double getHeight() {
+		return height;
+	}
+
+	public void setHeight(double height) { // int형으로 height 전달인자를 넣어줘도 double형으로 자동형변환
+		this.height = height;
+	}
+
+public void calcArea() {
+		
+		double area = width * height;		//area라는 변수 선언
+		
+		System.out.println("이 사각형의 넓이는 " + area + "입니다.");
+	}
+
+public void calcRound() {
+		
+		double round = (width + height) * 2;	//round라는 변수 선언
+		
+		System.out.println("이 사각형의 둘레는 " + round + "입니다.");
+	}
+}
+
+```
+
+4. 클래스자료형 배열
+
+뒤에서 배울 것임.
+
+5. 가변인자(가변배열)
+
+인자로 전달하는 값의 갯수가 정해지지 않은 경우 `가변배열`을 활용 가능 -> 모호성 발생 가능
+
+가변배열은 몇 개가 매개변수로 전달될 지 모르는 상황이므로 `뒤쪽`에 `...`으로 작성해줘야
+
+가변배열을 매개변수로 이용한 메소드(아래 예시의 경우 `testVariableLEngthArrayParameter`)는 둘 중 어떤 메소드를 호출하는 것인지에 대한 모호성 때문에 `오버로딩`하지 않는 것이 좋음 - 컴파일에러가 남
+
+```java
+pt.testVariableLengthArrayParameter("신사임당", new String[] {"테니스", "서예", "떡 썰기"});
+
+public void testVariableLengthArrayParameter(String name, String...hobby) {
+	System.out.println("취미의 갯수 : " + hobby.length);
+			System.out.println("취미 : ");
+			for(int i = 0; i < hobby.length; i++) {
+				System.out.print(hobby[i] + " ");
+			}
+			System.out.println();
+
+}
+```
+
+## 필드변수에 final 사용
+
+final이라는 예약어는 변경 불가능이란 뜻
+
+[Constant](https://www.notion.so/Constant-5e83b956b9cc4f43ba12dd089b19a3ce) 에서 상수를 `final int AGE;` 선언해주는 법을 배움
+
+클래스를 생성하고 만드는 `필드`도 변수이므로 `final`을 사용해서 값을 픽스해 둘 수 있음
+
+초기 인스턴스(객체)가 생성되고 나면 기본값 0이 필드에 들어가게 되는데, `final` 라면 그 초기화 이후 값 변경을 못 하므로 `선언하면서 초기화`를 해줘야 (compile error 발생)
+
+- non-static field에 final 사용
+    1. 선언과 동시에 초기화
+
+        `private final int NON_STATIC_NUM = 1;`
+
+    2. 생성자를 이용해서 초기화
+
+        ```java
+        private final String NON_STATIC_NAME;
+        	// 객체 생성 시 가장 먼저 실행되는 메소드 = 기본 생성자
+        	
+        	public FinalFieldTest(String nonStaticName) {
+        		
+        		this.NON_STATIC_NAME = nonStaticName; //필드변수에 값 넣어줄 수 있음
+        	}
+        ```
+
+- static field에 final 사용
+
+    static에도 자바에서 지정한 기본값이 초기에 대입 → final 키워드 사용 시 초기화를 안 하면 에러가 발생
+
+    `private static final int STATIC_Num = 1;`
+
