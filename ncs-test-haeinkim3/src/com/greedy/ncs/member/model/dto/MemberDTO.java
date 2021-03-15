@@ -72,8 +72,7 @@ public class MemberDTO {
 		this.check = check;
 		this.membernum = membernum;
 		
-		System.out.println("아이디 : " + id + ", " + "비밀번호 : " + pw + ", " + "이름 : " + name + ", " + "가입일 : " +  date + ", " + "키 : " + height + ", " + "몸무게 : " + 
-		weight + ", " + "활성화유무 : " + check  + ", " +  "회원번호 : " + membernum);
+		System.out.println("아이디 : " + id + ", " + "비밀번호 : " + pw + ", " + "이름 : " + name + ", " + "가입일 : " +  date + ", " + "키 : " + height + ", " + "몸무게 : " + weight + ", " + "활성화유무 : " + check  + ", " +  "회원번호 : " + membernum);
 	}
 	
 	
