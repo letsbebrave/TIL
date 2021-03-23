@@ -1,0 +1,332 @@
+-- 조인(JOIN)
+-- JOIN : 두 개의 테이블을 하나로 합쳐서 결과를 조회
+
+-- 오라클 전용 구문
+-- FROM절에 ','로 구분하여 합치게 될 테이블명을 기술하고
+-- WHERE절에 합치기에 사용할 컬럼명을 명시한다
+
+-- 연결에 사용할 두 컬럼명이 다른 경우
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , DEPT_ID
+     , DEPT_TITLE
+  FROM EMPLOYEE
+     , DEPARTMENT
+ WHERE DEPT_CODE = DEPT_ID;
+ -- DEPT_TITLE을 DEPARTMENT에서 가져온 것
+ -- 매칭되는 것만 가져옴(컬럼명이 다를 때 ORACLE)
+
+-- 연결에 사용할 두 컬럼명이 같은 경우
+SELECT
+       EMPLOYEE.EMP_ID
+     , EMPLOYEE.EMP_NAME
+     , EMPLOYEE.JOB_CODE
+     , JOB.JOB_NAME
+  FROM EMPLOYEE
+     , JOB
+ WHERE EMPLOYEE.JOB_CODE = JOB.JOB_CODE;
+ -- "column ambiguously define" 어떤 컬럼으로 해야 하는지 애매모호해서 잘 명시해줘
+
+-- 테이블 별칭 사용
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.JOB_CODE
+     , J.JOB_NAME
+  FROM EMPLOYEE E
+     , JOB J
+ WHERE E.JOB_CODE = J.JOB_CODE;
+
+
+-- ANSI 표준 구문
+-- 연결에 사용할 컬럼명이 같은 경우 USING(컬럼명)을 사용
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , JOB_CODE
+     , JOB_NAME
+  FROM EMPLOYEE
+  JOIN JOB USING(JOB_CODE);
+ 
+-- 컬럼이 같으면 USING 사용. 그러나 보통 테이블이 다른 경우 사용하는 on
+-- 컬럼명이 같은 경우에도 ON()을 사용 가능
+
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.JOB_CODE
+     , J.JOB_NAME
+  FROM EMPLOYEE E
+  JOIN JOB J on(E.JOB_CODE = J.JOb_CODE);
+-- 명시적으로 써놔야 나중에 덜 헷갈림
+
+-- 연결에 사용할 컬럼명이 다른 경우 on() 사용
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , DEPT_CODE
+     , DEPT_TITLE
+  FROM EMPLOYEE
+  JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID);
+
+-- 부서테이블과 지역테이블을 조인하여 테이블에 모든 데이터를 조회하세요
+-- ANSI 표준
+SELECT
+       D.DEPT_ID
+     , D.DEPT_TITLE
+     , D.LOCATION_ID
+     , L.NATIONAL_CODE
+     , L.LOCAL_NAME
+  FROM DEPARTMENT D
+     , LOCATION L
+  JOIN LOCATION L on(D.LOCATION_ID = L.LOCAL_CODE);
+ 
+SELECT
+       *
+  FROM DEPARTMENT
+  JOIN LOCATION ON(LOCATION_ID = LOCAL_CODE);
+
+-- 오라클 전용
+SELECT
+       DEPT_ID
+     , DEPT_TITLE
+     , LOCATION_ID
+     , NATIONAL_CODE
+     , LOCAL_NAME
+  FROM DEPARTMENT
+     , LOCATION
+ WHERE LOCATION_ID = LOCAL_CODE;
+
+SELECT
+       *
+  FROM DEPARTMENT D
+     , LOCATION L
+ WHERE D.LOCATION_ID = L.LOCAL_CODE;
+
+-- 먼저 조인 기준 컬럼 찾아야
+SELECT * FROM DEPARTMENT;
+SELECT * FROM LOCATION;
+
+-- 조인은 기본이 EQUAL JOIN이다(EQU JOIN이라고도 함)
+-- 연결되는 컬럼의 값이 일치하는 행들만 조인된다.
+
+-- 일치하는 값이 없는 행은 조인에서 제외되는 것을 INNER JOIN이라고 한다.
+
+-- JOIN의 기본은 INNER JOIN & EQU JOIN 이다.
+-- 같은 애들은 합치고 같은 게 없는 애들은 제외
+
+-- OUTER JOIN : 두 테이블이 지정하는 컬럼 값이 일치하지 않는 행도 조인에 포함시킨다.
+--              *반드시* OUTER JOIN임을 명시해야 한다.
+
+-- 이너 조인은 일치하는 건 다 가지고 옴
+-- left outer join은 왼쪽 편에 잇는 행의 개수를 기준으로 조인
+-- 왼쪽에 있는 행의 개수만큼 포함되는 애들만큼만 다 가져옴
+-- 오른쪽에 행의 개수를 기준으로 조인
+-- 두 테이블에 있는 모든 행을 가져옴
+
+-- 1. LEFT OUTER JOIN : 합치기에 사용한 테이블 중 (EMPLOYEE의 행의 수를 기준으로 조인)
+--                      왼편에 기술된 테이블의 행의 수를 기준으로 JOIN
+-- 2. RIGHT OUTER JOIN : 합치기에 사용한 두 테이블 중 오른편에 기술된 테이블의 행의 수를 기준
+--                       으로 JOIN
+-- 3. FULL OUTER JOIN : 합치기에 사용한 두 테이블이 가진 모든 행을 결과에 포함하여 JOIN
+
+-- INNER JOIN
+SELECT
+       EMP_NAME
+     , DEPT_TITLE
+  FROM EMPLOYEE
+  JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID);
+-- 23 -> 21개 DEPT_CODE에서 DEPT_ID에 포함되지 않는 애들은 제외
+
+-- LEFT OUTER JOIN
+-- 1) ANSI 표준
+SELECT
+       EMP_NAME
+     , DEPT_TITLE
+  FROM EMPLOYEE
+--  LEFT OUTER JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
+  LEFT JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
+-- 23 -> 23개 EMPLOYEE 기준
+
+-- 2) 오라클 전용 구문
+SELECT
+       EMP_NAME
+     , DEPT_TITLE
+  FROM EMPLOYEE
+     , DEPARTMENT
+ WHERE DEPT_CODE = DEPT_ID(+);    
+-- 둘의 위치 바꾸면 RIGHT OUTER JOIN 됨
+
+
+-- RIGHT OUTER JOIN
+SELECT
+       EMP_NAME
+     , DEPT_TITLE
+  FROM EMPLOYEE
+ RIGHT JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID);
+ --왼쪽 임플로이 테이블의 부서코드를 다 갖고 오는데, 임플로이에서 추가 안해놨던 부서코드들이 다 나오게 됨
+
+
+-- 오라클 전용 구문
+SELECT
+       EMP_NAME
+     , DEPT_TITLE
+  FROM EMPLOYEE
+     , DEPARTMENT
+ WHERE DEPT_CODE(+) = DEPT_ID;  
+
+
+-- FULL OUTER JOIN
+-- ANSI 표준
+SELECT
+       EMP_NAME
+     , DEPT_TITLE
+  FROM EMPLOYEE
+  FULL JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID);
+
+-- 오라클 전용 구문
+-- 오라클 전용 구문으로는 FULL OUTER JOIN을 하지 못한다.
+SELECT
+       EMP_NAME
+     , DEPT_TITLE
+  FROM EMPLOYEE
+     , DEPARTMENT
+ WHERE DEPT_CODE(+) = DEPT_ID(+);  
+
+
+-- CROSS JOIN : 카테이션곱이라고도 한다.
+--              조인되는 테이블의 각 행들이 모두 매핑된 데이터가 검색되는 방법
+SELECT
+       EMP_NAME
+     , DEPT_TITLE
+  FROM EMPLOYEE
+ CROSS JOIN DEPARTMENT;
+-- 매핑되는 거 다 넣고 그 다음에 조회하겠다 (기준점을 찾기 애매한 경우)
+SELECT COUNT(*) FROM EMPLOYEE;
+SELECT COUNT(*) FROM DEPARTMENT;
+
+-- NON EQUAL JOIN(NON EQU JOIN)
+-- 지정한 컬럼의 값이 일치하는 경우가 아닌, 값의 범위에 포함되는 행들을 연결하는 방식
+-- ANSI 표준
+SELECT
+       EMP_NAME
+     , SALARY
+     , E.SAL_LEVEL
+     , S.SAL_LEVEL
+  FROM EMPLOYEE E
+  JOIN SAL_GRADE S ON (SALARY BETWEEN MIN_SAL AND MAX_SAL);
+  -- 이 사이에 있는 값이면 S.SAL_LEVEL을 가져다 주세요
+  -- 범위로도 조인을 해서 가져올 수 있음
+ 
+-- 오라클 전용
+SELECT
+       EMP_NAME
+     , SALARY
+     , E.SAL_LEVEL
+     , S.SAL_LEVEL
+  FROM EMPLOYEE E
+     , SAL_GRADE S
+ WHERE SALARY BETWEEN MIN_SAL AND MAX_SAL;
+
+-- SELF JOIN : 같은 테이블을 조인하는 경우
+--             자기 자신과 조인을 맺는 것이다.
+-- ex. MANAGER_ID 가져와서 EMP_NAME
+-- 오라클 전용(별칭 필수)
+SELECT
+       E1.EMP_ID
+     , E1.EMP_NAME 사원이름
+     , E1.DEPT_CODE
+     , E1.MANAGER_ID
+     , E2.EMP_NAME 관리자이름
+  FROM EMPLOYEE E1
+     , EMPLOYEE E2
+ WHERE E1.MANAGER_ID = E2.EMP_ID;
+ -- 순서가 중요하진 않음
+ 
+-- ANSI 표준
+SELECT
+       E1.EMP_ID
+     , E1.EMP_NAME 사원명
+     , E1.DEPT_CODE
+     , E1.MANAGER_ID
+     , E2.EMP_NAME 관리자이름
+  FROM EMPLOYEE E1
+JOIN EMPLOYEE E2 ON (E1.MANAGER_ID = E2.EMP_ID);
+
+
+
+-- 다중 JOIN : N개의 테이블을 조회할 때 사용
+-- ANSI
+-- *조인 순서* 중요하다! (명시적)
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , DEPT_CODE
+     , DEPT_TITLE
+     , LOCAL_NAME
+  FROM EMPLOYEE
+  JOIN DEPARTMENT ON(DEPT_CODE = DEPT_ID)
+  JOIN LOCATION ON(LOCATION_ID = LOCAL_CODE);
+
+-- 오라클 전용 구문
+-- 조인 순서 상관 없음
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , DEPT_CODE
+     , DEPT_TITLE
+     , LOCAL_NAME
+  FROM EMPLOYEE
+     , DEPARTMENT
+     , LOCATION
+  WHERE DEPT_CODE = DEPT_ID
+    AND LOCATION_ID = LOCAL_CODE
+    AND EMP_ID = 200;
+
+-- 직급이 대리이면서 아시아 지역에 근무하는 직원 조회
+-- 사번, 이름, 직급명, 부서명, 근무 지역명, 급여 조회
+-- 조회 시 모든 컬럼에 테이블 별칭 사용
+-- ANSI 표준
+SELECT
+       E.EMP_NO
+     , E.EMP_NAME
+     , J.JOB_NAME
+     , L.LOCAL_NAME
+     , E.SALARY
+  FROM EMPLOYEE E
+  JOIN JOB J USING(JOB_CODE)
+  JOIN DEPARTMENT D ON (DEPT_CODE = DEPT_ID)
+  JOIN LOCATION L ON(LOCATION_ID = LOCAL_CODE)
+ WHERE JOB_CODE = 'J6'
+   AND LOCAL_NAME LIKE 'ASIA%';
+
+   
+-- 오라클 전용 표준
+SELECT
+       E.EMP_NO
+     , E.EMP_NAME
+     , J.JOB_NAME
+     , L.LOCAL_NAME
+     , E.SALARY
+  FROM EMPLOYEE E
+     , JOB J
+     , DEPARTMENT D
+     , LOCATION L
+  WHERE E.JOB_CODE = J.JOB_CODE
+    AND E.DEPT_CODE = D.DEPT_ID
+    AND D.LOCATION_ID = L.LOCAL_CODE
+    AND J.JOB_NAME = '대리'
+    AND L.LOCAL_NAME LIKE 'ASIA%';
+
+
+
+
+
+
+
+
+
+
+
+ 
