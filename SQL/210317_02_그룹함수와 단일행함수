@@ -1,0 +1,666 @@
+-- 그룹함수와 단일행함수
+-- 함수(FUNCTION) : 컬럼 값을 읽어서 계산한 결과를 리턴한다.
+-- 단일행(SINGLE ROW)함수 : 컬럼에 기록된 N개의 값을 읽어서 N개의 결과를 리턴
+-- 그룹(GROUP) 함수 : 컬럼에 기록된 N개의 값을 읽어서 한 개의 결과를 리턴
+-- SELECT절에 단일행 함수와 그룹함수를 함께 사용하지 못함
+-- 결과행의 갯수가 다르기 때문
+
+-- 함수를 사용할 수 있는 위치 : SELECT절, WHERE절, GROUP BY절, HAVING절, ORDER BY절
+
+-- 그룹함수 : SUM, AVG, MAX, MIN, COUNT
+
+-- SUM(숫자가 기록된 컬럼명) : 합계를 구하여 리턴
+SELECT
+       SUM(SALARY)
+  FROM EMPLOYEE;
+ 
+-- AVG(숫자가 기록된 컬럼명) : 평균을 구하여 리턴
+SELECT
+       AVG(SALARY)
+  FROM EMPLOYEE;
+ 
+-- MIN(컬럼명) : 컬럼에서 가장 작은 값 리턴
+-- 취급하는 자료형은 ANY TYPE이다.
+SELECT
+       MIN(EMAIL)
+     , MIN(HIRE_DATE)
+     , MIN(SALARY)
+  FROM EMPLOYEE;
+ 
+-- MAX(컬럼명) : 컬럼에서 가장 큰 값 리턴
+-- 취급하는 자료형은 ANY TYPE이다.
+SELECT
+       MAX(EMAIL)
+     , MAX(HIRE_DATE)
+     , MAX(SALARY)
+  FROM EMPLOYEE
+ WHERE EMP_ID <> 200;
+
+SELECT
+       AVG(BONUS) -- 보너스의 기본 평균
+     , AVG(DISTINCT BONUS)-- 중복 제거 평균
+     , AVG(NVL(BONUS, 0))-- BONUS의 NULL을 0으로 바꾸고 평균에 포함
+  FROM EMPLOYEE;
+ 
+-- COUNT(* | 컬럼명) : 행의 갯수를 해아려서 리턴
+-- 중복 제거? NULL 포함?
+-- COUNT([DISTINCT] 컬럼명) : 중복을 제거한 행의 갯수 리턴
+-- COUNT(*) : NULL을 포함한 전체 행 갯수 리턴
+-- COUNT(컬럼명) : NULL을 제외한 실제 값이 기록된 행 갯수 리턴
+SELECT
+       COUNT(*)
+  FROM EMPLOYEE;
+ 
+SELECT
+ *
+ FROM EMPLOYEE;
+
+-- 단일행 함수
+-- 문자 관련 함수
+-- : LENGTH, LENTHB(byte의 값), SUBSTR, UPPER, LOWER, INSTR(특정문자열이 있는지 찾음)....
+SELECT
+       LENGTH('오라클')
+     , LENGTHB('오라클')
+  FROM DUAL;
+
+SELECT
+       LENGTH(EMAIL)
+     , LENGTHB(EMAIL)
+  FROM EMPLOYEE;
+ 
+ 
+-- INSTR('문자열'|컬럼명, '문자', 찾을 위치의 시작값, [빈도])
+-- 문자의 위치 파악 가능 (위치가 각각 다른 행의 경우)
+-- 찾을 위치의 시작값은 없거나, 1, -1 중 하나
+SELECT
+       EMAIL
+     , INSTR(EMAIL, '@', -1)
+  FROM EMPLOYEE;
+
+-- 출력할 때는 앞에서부터 센 값으로 위치를 찾아줌
+
+SELECT INSTR('AABAACAABBAA', 'B') FROM DUAL;
+-- 기본값은 왼쪽에서부터 시작됨
+SELECT INSTR('AABAACAABBAA', 'B', 1) FROM DUAL;
+SELECT INSTR('AABAACAABBAA', 'B', -1) FROM DUAL;
+SELECT INSTR('AABAACAABBAA', 'B', 1, 2) FROM DUAL; -- 원하는 B의 2번째 위치
+SELECT INSTR('AABAACAABBAA', 'B', -1, 2) FROM DUAL;
+
+-- LPAD / RPAD : 주어진 컬럼 문자열에 임의의 문자열을 덧붙여 길이 N의 문자열을 반환하는 함수
+SELECT
+       LPAD(EMAIL, 20, '#')
+       -- 이메일의 공간 20개로 하고 왼쪽 공란을 #으로 채움
+  FROM EMPLOYEE;
+
+SELECT
+       RPAD(EMAIL, 20, '#')
+       -- 이메일의 공간 20개로 하고 오른쪽 공란을 #으로 채움
+  FROM EMPLOYEE;
+
+SELECT
+       LPAD(EMAIL, 10)
+  FROM EMPLOYEE;
+
+SELECT
+       RPAD(EMAIL, 10)
+  FROM EMPLOYEE;
+ 
+-- LTRIM / RTRIM : 주어진 컬럼이나 문자열 왼쪽/오른쪽에서
+--                 지정한 문자 혹은 문자열을 제거한 나머지를 반환하는 함수
+SELECT LTRIM('     GREEDY') FROM DUAL;
+-- 기본값은 공백
+SELECT LTRIM('     GREEDY', ' ') FROM DUAL;
+-- 내가 뺄 부분 지정 가능
+SELECT LTRIM('0000123456', '0') FROM DUAL;
+SELECT LTRIM('123123GREEDY','123') FROM DUAL;
+SELECT LTRIM('123123GREEDY123','123') FROM DUAL;
+-- 문자열 만나면 stop하고 뒤에 꺼는 찾지 않음
+SELECT LTRIM('ACABACCGREEDY', 'ABC') FROM DUAL;
+-- A, B, C 따로 다 찾아줌 GREEDY가 인쇄됨
+SELECT LTRIM('5782GREEDY', '0123456789') FROM DUAL;
+-- 문자는 숫자를 만났을 때 stop, 숫자는 문자를 만났을 때 stop
+
+SELECT RTRIM('GREEDY     ') FROM DUAL;
+SELECT RTRIM('GREEDY     ', ' ') FROM DUAL;
+SELECT RTRIM('1234560000', '0') FROM DUAL;
+SELECT RTRIM('GREEDY123123','123') FROM DUAL;
+SELECT RTRIM('123GREEDY123123','123') FROM DUAL;
+SELECT RTRIM('GREEDYACABACC', 'ABC') FROM DUAL;
+SELECT RTRIM('GREEDY5782', '0123456789') FROM DUAL;
+
+-- TRIM : 주어진 컬럼이나 문자열의 앞/뒤에 지정한 문자를 제거
+SELECT TRIM('    GREEDY    ') FROM DUAL;
+SELECT TRIM('Z' FROM 'ZZZGREEDYZZZ') FROM DUAL;
+SELECT TRIM(LEADING 'Z' FROM 'ZZZGREEDYZZZ') FROM DUAL;
+SELECT TRIM(TRAILING 'Z' FROM 'ZZZGREEDYZZZ') FROM DUAL;
+SELECT TRIM(BOTH'3' FROM '333GREEDY333') FROM DUAL;
+
+-- SUBSTR : 컬럼이나 문자열에서 지정한 위치로부터 지정한 갯수의 문자열을 잘라서 리턴하는 함수
+SELECT SUBSTR('SHOWMETHEMONEY', 5, 2) FROM DUAL;
+SELECT SUBSTR('SHOWMETHEMONEY', 7) FROM DUAL;
+-- 갯수 지정 안하면 시작부터 끝까지 다
+SELECT SUBSTR('SHOWMETHEMONEY', -8,3) FROM DUAL;
+SELECT SUBSTR('쇼우 미 더 머니', 2, 5) FROM DUAL;
+
+SELECT
+       EMP_NAME
+     , SUBSTR(EMP_NO, 8, 1)
+  FROM EMPLOYEE;
+ 
+-- EMPLOYEE 테이블에서 직원들의 주민번호를 조회하여 사원명, 생년, 생월, 생일을 각각 분리하여 조회
+-- 단 컬럼의 별칭은 사원명, 생년, 생월, 생일로 한다.
+SELECT
+       EMP_NAME AS 사원명
+     , SUBSTR(EMP_NO,1,2) AS 생년
+     , SUBSTR(EMP_NO,3,2) AS 생월
+     , SUBSTR(EMP_NO,5,2) AS 생일
+     , EMP_NO
+  FROM EMPLOYEE;
+
+-- 날짜 데이터에서 사용할 수 있다.
+-- 직원들의 입사일에도 입사년도, 입사월, 입사날짜를 분리 조회
+SELECT
+       HIRE_DATE
+     , SUBSTR(HIRE_DATE,1,2) 입사년도
+     , SUBSTR(HIRE_DATE,4,2) 입사월
+     , SUBSTR(HIRE_DATE,7,2) 입사날짜
+  FROM EMPLOYEE;
+ 
+-- WHERE절에서 함수 사용도 가능
+-- 여직원들의 모든 컬럼 정보를 조회
+SELECT
+       *
+  FROM EMPLOYEE
+ WHERE SUBSTR(EMP_NO,8,1) = '2';
+
+-- WHERE절에는 단일행 함수만 사용 가능
+SELECT
+       *
+  FROM EMPLOYEE
+ WHERE SALARY > AVG(SALARY); --  그룹함수 사용 시 에러
+
+-- 함수 중첩 사용 가능 : 함수 안에서 함수 사용 가능
+-- EMPLOYEE 테이블에서 사원명, 주민번호 조회
+-- 단, 주민정보는 생년월일만 보이게 하고, '-' 다음의 값은 '*'로 바꿔서 출력
+SELECT
+       EMP_NAME 사원명
+--     , SUBSTR(EMP_NO,1,7) || '********' 주민번호
+     , RPAD(SUBSTR(EMP_NO,1,7),7,'*') || '********' 주민번호
+  FROM EMPLOYEE;
+
+-- EMPLOYEE 테이블에서 사원명, 이메일 @이후를 제외한 아이디 조회
+SELECT
+       EMP_NAME
+     , EMAIL
+     , SUBSTR(EMAIL,1,INSTR(EMAIL,'@')-1) -- @이전까지 출력하고 싶으므로 1을 빼줌
+  FROM EMPLOYEE;
+
+-- SUBSTRB : 바이트 단위로 추출하는 함수
+SELECT
+       SUBSTR('ORACLE',3,2)
+     , SUBSTRB('ORACLE',3,2)
+  FROM DUAL;
+
+SELECT
+       SUBSTR('오라클',2,2)
+     , SUBSTRB('오라클',4,6) -- 3바이트로 해당 글자를 계산
+  FROM DUAL;
+
+-- LOWER / UPPER / INITCAP(첫글자를 대문자로) : 대소문자 변경해주는 함수
+-- LOWER(문자열 | 컬럼) : 소문작로 변경해주는 함수
+SELECT
+       LOWER('Welcome To My World')
+  FROM DUAL;
+
+-- UPPER(문자열 | 컬럼) : 대문자로 변경해주는 함수
+SELECT
+       UPPER('welcome to my world')
+  FROM DUAL;
+
+-- INITCAP : 앞글자만 대문자로 변경해주는 함수(칸 띄우기 후에도 대문자로)
+SELECT
+       INITCAP('welcome to my world')
+  FROM DUAL;
+
+
+-- CONCAT : 문자열 또는 컬럼 두 개를 입력 받아 하나로 합친 후 리턴
+SELECT
+       CONCAT('가나다라','ABCD')
+  FROM DUAL;
+ 
+SELECT
+       '가나다라' || 'ABCD'
+  FROM DUAL;
+
+
+-- REPLACE : 컬럼 혹은 문자열을 입력받아 변경하고자 하는 문자열을
+--           원하는 문자열로 바꾼 후 리턴 (바꿔치기)
+SELECT
+       REPLACE('서울시 강남구역삼동', '역삼동', '삼성동')
+  FROM DUAL;
+-- 띄어쓰기 상관 없음
+
+
+-- 단일행함수 중 문자관련 함수는 여기까지..
+
+
+-- 단일행함수
+-- 숫자처리 함수 : ABS,MOD,ROUND,FLOOR,TRUNC,CEIL
+-- ABS(숫자 | 숫자로 된 컬럼명) : 절대값 구하는 함수
+SELECT
+       ABS(-10)
+     , ABS(10)
+  FROM DUAL;
+
+-- MOD(숫자|숫자로 된 컬럼명, 숫자|숫자로된 컬럼명)
+-- 두 수를 나누어서 나머지를 구하는 함수
+-- 처음 인자는 나누어지는 수, 두번째 인자는 나눌 수
+SELECT
+       MOD(10,5)
+     , MOD(10,3)
+  FROM DUAL;
+ 
+-- ROUND(숫자 | 숫자로 된 컬럼명, [위치])
+-- 반올림해서 리턴하는 함수
+SELECT ROUND(123.556) FROM DUAL;
+-- 기본은 소수점 첫째 자리
+SELECT ROUND(123.456,0) FROM DUAL;
+SELECT ROUND(123.456,1) FROM DUAL;
+SELECT ROUND(123.456,2) FROM DUAL;
+-- 소수점 두 자리를 출력하겠다
+SELECT ROUND(123.456,-2) FROM DUAL;
+-- 23을 00으로 바꿈
+-- 정수자리 끝부터 몇 자리를 0으로 만들 것인가
+SELECT ROUND(123.456,-3) FROM DUAL;
+
+-- FLOOR(숫자 | 숫자로 된 컬럼명) : 내림처리하는 함수
+SELECT FLOOR(123.456) FROM DUAL;
+SELECT FLOOR(123.678) FROM DUAL;
+
+-- TRUNC(숫자 | 숫자로 된 컬럼명, [위치]) : 내림처리(절삭) 함수
+-- 위치를 잡아내서 그 위치만큼만 잘라낼 수도 있음
+SELECT TRUNC(123.456) FROM DUAL;
+SELECT TRUNC(123.678) FROM DUAL;
+SELECT TRUNC(123.456,1) FROM DUAL;
+SELECT TRUNC(123.456,2) FROM DUAL;
+SELECT TRUNC(123.456,-1) FROM DUAL;
+-- 정수 끝에서 첫번째 수를 0으로
+
+-- CEIL(숫자 | 숫자로 된 컬럼명) : 올림처리 함수
+SELECT CEIL(123.456) FROM DUAL;
+SELECT CEIL(123.678) FROM DUAL;
+
+SELECT
+       ROUND(123.456) 반올림
+     , FLOOR(123.456) 내림
+     , TRUNC(123.456) "내림(절삭)"
+     , CEIL(123.456)  올림
+  FROM DUAL;
+ 
+-- 날짜 처리 함수 : SYSDATE(현재 날짜), MONTHS_BETWEEN, ADD_MONTHS, NEXT_DAY, LAST_DAY, EXTRACT
+-- SYSDATE : 시스템에 저장되어 있는 날짜를 반환하는 함수
+SELECT SYSDATE FROM DUAL;
+
+-- MONTHS_BETWEEN(날짜, 날짜)
+-- 두 날짜의 개월 수 차이를 숫자로 리턴하는 함수
+SELECT
+       EMP_NAME
+     , HIRE_DATE
+     , CEIL(MONTHS_BETWEEN(SYSDATE, HIRE_DATE))
+  FROM EMPLOYEE;
+     
+-- ADD_MONTHS(날짜, 숫자)
+-- 날짜에 숫자만큼 개월 수 더해서 리턴
+SELECT
+       ADD_MONTHS(SYSDATE,5)
+  FROM DUAL;
+ 
+-- EMPLOYEE 테이블에서 사원의 이름, 입사일, 입사 후 6개월이 되는 날짜 조회
+SELECT
+       EMP_NAME
+     , ADD_MONTHS(HIRE_DATE,6)
+  FROM EMPLOYEE;
+ 
+-- EMPLOYEE 테이블에서 근무년수가 20년 이상인 직원 조회
+SELECT
+       EMP_NAME
+  FROM EMPLOYEE
+-- WHERE MONTHS_BETWEEN(SYSDATE, HIRE_DATE) >= 240;
+ WHERE ADD_MONTHS(HIRE_DATE, 240) <= SYSDATE;    
+
+-- NEXT_DAY(기준날짜, 요일(문자 | 숫자)
+-- 기준 날짜에서 구하려는 요일에 가장 가까운 날짜 리턴
+SELECT SYSDATE, NEXT_DAY(SYSDATE,'금') FROM DUAL;
+-- 가장 가까운 금요일은 26일
+SELECT SYSDATE, NEXT_DAY(SYSDATE, 6) FROM DUAL;
+-- 시작은 일요일
+SELECT SYSDATE, NEXT_DAY(SYSDATE, '금요일') FROM DUAL;
+SELECT SYSDATE, NEXT_DAY(SYSDATE, 'FRIDAY') FROM DUAL;
+-- 시스템 OS가 정의하고 있는 언어 타입만 받아들임
+ALTER SESSION SET NLS_LANGUAGE = DANISH;
+SELECT SYSDATE, NEXT_DAY(SYSDATE, 'FREDAG') FROM DUAL;
+
+ALTER SESSION SET NLS_LANGUAGE = KOREAN;
+
+-- LAST_DAY(날짜) : 해당 월의 마지막 날짜를 구하여 리턴
+SELECT SYSDATE, LAST_DAY(SYSDATE) FROM DUAL;
+
+-- EMPLOYEE 테이블에서 사원명, 입사일 - 오늘, 오늘 - 입사일 조회
+-- CEIL, ABS
+SELECT
+       EMP_NAME
+     , CEIL(ABS(HIRE_DATE - SYSDATE)) AS "근무일수1"
+     , CEIL(SYSDATE - HIRE_DATE) AS "근무일수2"
+  FROM EMPLOYEE;
+     
+-- EMPLOYEE 테이블에서 사원명, 입사일, 입사한 월의 근무일수를 조회
+SELECT
+       EMP_NAME AS 사원명
+     , SUBSTR(HIRE_DATE,7,2) AS 입사일
+     , LAST_DAY(HIRE_DATE) - HIRE_DATE + 1 AS "입사한 월의 근무일수"
+  FROM EMPLOYEE;
+
+-- EXTRACT : 년, 월, 일 정보를 추출하여 리턴하는 함수
+-- EXTRACT(YEAR FROM 날짜) : 년도만 추출
+-- EXTRACT(MONTH FROM 날짜) : 월만 추출
+-- EXTRACT(DAY FROM 날짜) : 날짜만 추출
+SELECT
+       EXTRACT(YEAR FROM SYSDATE) 년도
+     , EXTRACT(MONTH FROM SYSDATE) 월
+     , EXTRACT(DAY FROM SYSDATE) 일
+  FROM DUAL;
+ 
+-- EMPLOYEE 테이블에서 사원이름, 입사년, 입사월, 입사일 조회
+SELECT
+       EMP_NAME 사원이름
+     , EXTRACT(YEAR FROM HIRE_DATE) 입사년
+     , EXTRACT(MONTH FROM HIRE_DATE) 입사월
+     , EXTRACT(DAY FROM HIRE_DATE) 입사일
+  FROM EMPLOYEE
+-- ORDER BY EMP_NAME; -- ASC 오름차순(기본값)
+-- ORDER BY EMP_NAME DESC; -- DESC 내림차순
+-- ORDER BY 사원이름;
+-- ORDER BY 1;
+-- 첫번째 컬럼 기준으로 정렬하겠다 (원래는 컬럼명 지칭 but 계산식에 있거나 할 때 순번을 줘서 그거 기준으로)
+ ORDER BY 입사년 ASC, 사원이름 DESC;
+
+-- 쿼리문 순서 *중요*
+-- FROM 절에서 테이블 몽땅 다 들고 옴 , WHERE절 조건절 가서 조건에 맞는 테이블 추림,
+-- SELECT절 들어가서 맞는 행을 가져옴, 그리고 ORDER BY 로 감
+-- 엑셀로 해보기
+
+-- EMPLOYEE 테이블에서 직원의 이름, 입사일, 근무년수 조회
+-- 단, 근무년수는 현재년도 - 입사년도로 조회
+SELECT
+       EMP_NAME
+     , HIRE_DATE
+     , EXTRACT(YEAR FROM SYSDATE) - EXTRACT(YEAR FROM HIRE_DATE)
+  FROM EMPLOYEE;
+
+-- MONTHS_BETWEEN으로 근무년수 조회
+SELECT
+       EMP_NAME
+     , HIRE_DATE
+     , CEIL(MONTHS_BETWEEN(SYSDATE,HIRE_DATE)/12) 근무년수
+  FROM EMPLOYEE;
+
+-- 날짜 포맷 변경
+ALTER SESSION SET NLS_DATE_FORMAT = 'RR/MM/DD';
+
+-- 형변환 함수
+-- TO_CHAR(날짜, [포맷]) : 날짜형 데이터를 문자형 데이터로 변경
+-- TO_CHAR(숫자, [포맷]) : 숫자형 데이터를 문자형 데이터로 변경
+SELECT TO_CHAR(1234) FROM DUAL;
+SELECT TO_CHAR(1234, '999999999') FROM DUAL;
+-- 9는 공백이고 0은 0으로 채움
+SELECT TO_CHAR(1234, '000000') FROM DUAL;
+SELECT TO_CHAR(1234, 'L99999') FROM DUAL;
+SELECT TO_CHAR(1234, '$99,999') FROM DUAL;
+SELECT TO_CHAR(1234, '00,000') FROM DUAL;
+SELECT TO_CHAR(1234,'999') FROM DUAL;
+
+-- 직원테이블에서 사원명, 급여 조회
+-- 단 급여는 '\9,000,000' 형식으로 표시하세요
+SELECT
+       EMP_NAME
+     , TO_CHAR(SALARY, 'L99,999,999')
+  FROM EMPLOYEE;
+     
+-- 날짜 데이터 포멧 적용시에도 TO_CHAR 함수 사용
+SELECT TO_CHAR(SYSDATE, 'PM HH24:MI:SS') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'AM HH:MI:SS') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'MON DY, YYYY') FROM DUAL; -- 3월 금, 2021
+SELECT TO_CHAR(SYSDATE, 'YYYY-fmMM-DD DAY') FROM DUAL; -- 2021-3-19 금요일
+SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD DAY') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'YEAR, Q') || '분기' FROM DUAL;
+
+SELECT
+       EMP_NAME
+     , TO_CHAR(HIRE_DATE, 'YYYY-MM-DD') 입사일
+  FROM EMPLOYEE;
+
+SELECT
+       EMP_NAME
+     , TO_CHAR(HIRE_DATE, 'YYYY"년" MM"월" DD"일"') 입사일
+  FROM EMPLOYEE;    
+
+SELECT
+       EMP_NAME
+     , HIRE_DATE
+     , TO_CHAR(HIRE_DATE, 'YYYY/MM/DD HH24:MI:SS') 상세입사일
+  FROM EMPLOYEE;
+ 
+-- 오늘 날짜에 대해 년도 4자리, 년도 2자리
+-- 년도 이름으로 출력
+SELECT
+       TO_CHAR(SYSDATE,'YYYY')
+     , TO_CHAR(SYSDATE,'RRRR')
+     , TO_CHAR(SYSDATE,'YY')
+     , TO_CHAR(SYSDATE,'RR')
+     , TO_CHAR(SYSDATE,'YEAR')
+FROM DUAL;
+
+-- RR과 YY의 차이
+-- RR은 두자리 년도를 네자리로 바꿀 때
+-- 바꿀 년도가 50년 미만이면 2000년을 적용,
+-- 50년 이상이면 1900년을 적용
+-- 1900년대이면 RR을 사용
+
+-- 년도 바꿀 때(TO_DATE 사용시) Y를 적용하면
+-- 현재 세기(2000년)가 적용됨
+SELECT
+       TO_CHAR(TO_DATE('980630','YYMMDD'), 'YYYY-MM-DD')
+  FROM DUAL;
+
+SELECT
+       TO_CHAR(TO_DATE('980630','RRMMDD'), 'RRRR-MM-DD')
+  FROM DUAL;
+
+-- 오늘 날짜에서 월만 출력 like EXTRACT(MONTH FROM ~)
+SELECT
+       TO_CHAR(SYSDATE,'MM')
+     , TO_CHAR(SYSDATE,'MONTH')
+     , TO_CHAR(SYSDATE,'MON')
+     , TO_CHAR(SYSDATE,'RM')
+  FROM DUAL;
+
+-- 오늘 날짜에서 일만 출력(DDD/DD/D)
+SELECT
+       TO_CHAR(SYSDATE, '"1년 기준 " DDD "일째"')
+     , TO_CHAR(SYSDATE, '"달 기준" DD "일째"')
+     , TO_CHAR(SYSDATE, '"주 기준" D "일째"')
+  FROM DUAL;
+ 
+-- 오늘 날짜에서 분기와 요일 출력 처리
+SELECT
+        TO_CHAR(SYSDATE, 'Q"분기"')
+      , TO_CHAR(SYSDATE, 'DAY')
+      , TO_CHAR(SYSDATE, 'DY')    
+  FROM DUAL;
+ 
+-- 직원테이블에서 이름, 입사일 조회
+-- 입사일에 포멧 적용한다
+-- '2018년 6월 15일 (수)' 형식으로 출력 처리하세요.
+SELECT
+       EMP_NAME
+     , TO_CHAR(HIRE_DATE, 'YYYY"년" MM"월" DD"일" "("DY")"')
+  FROM EMPLOYEE;
+ 
+
+-- TO_DATE : 문자 혹은 숫자형 데이터를 날짜형 데이터로 변환하여 리턴
+-- TO_DATE(문자형데이터, [포멧])
+-- 문자형 데이터를 날짜로 변경한다
+-- TO_DATE(숫자, [포멧])
+SELECT
+       TO_DATE('2010101','RRRRMMDD')
+  FROM DUAL;      
+
+SELECT
+       TO_CHAR(TO_DATE('20100101','RRRRMMDD'),'RRRR, MON')
+  FROM DUAL;
+ 
+SELECT
+       TO_DATE('041030 143000', 'RRMMDD HH24MISS')
+  FROM DUAL;
+ 
+SELECT
+       TO_CHAR(TO_DATE('041030 143000', 'RRMMDD HH24MISS'),'DD-MON-RR HH:MI:SS PM')
+  FROM DUAL;
+ 
+-- 직원 테이블에서 2000년도 이후에 입사한 사원의
+-- 사번, 이름, 입사일을 조회하세요
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , HIRE_DATE
+  FROM EMPLOYEE
+-- WHERE HIRE_DATE > '20000101'; -- 자동형변환(문자열은 날짜로 자동형변환됨)
+-- WHERE  HIRE_DATE > 20000101; -- 자동형변환 X(숫자는 날짜로 자동형변환 안됨)
+ WHERE HIRE_DATE > TO_DATE(20000101, 'RRRRMMDD');
+ 
+ 
+ -- TO_NUMBER(문자데이터,[포멧]) : 문자데이터를 숫자로 리턴
+SELECT TO_NUMBER('123456789') FROM DUAL;
+
+-- 자동형변환
+SELECT '123' + '456' FROM DUAL;
+ -- 숫자로 된 문자열만 자동형변환 가능
+SELECT '123' + '456A' FROM DUAL;
+
+SELECT
+       EMP_NAME
+     , HIRE_DATE
+  FROM EMPLOYEE
+ WHERE HIRE_DATE = '90/02/06'; -- 자동형변환
+ 
+SELECT '1,000,000' + '500,000' FROM DUAL; -- 자동형변환 안됨
+
+-- 숫자로 바꿔주면 자동형변환 됨
+SELECT TO_NUMBER('1,000,000','99,999,999') + TO_NUMBER('500,000','999,999')
+  FROM DUAL;
+ 
+-- 직원 테이블에서 사원번호가 201인 사원의 이름, 주민번호 앞자리, 뒷자리
+-- 주민번호 앞자리와 뒷자리 합을 조회하세요
+-- 단, 자동형변환 사용하지 않고 조회
+SELECT
+      EMP_NAME
+    , EMP_NO
+    , (SUBSTR(EMP_NO,1,6) + SUBSTR(EMP_NO,8,7)) AS "주민번호 합"
+  FROM EMPLOYEE
+ WHERE EMP_ID = 201;
+
+SELECT
+ *
+ FROM EMPLOYEE;
+
+
+-- NULL 처리 함수
+-- NVL(컬럼명, 컬럼값이 NULL일 떄 바꿀 값)
+SELECT
+       EMP_NAME
+     , BONUS
+     , NVL(BONUS, 0)
+  FROM EMPLOYEE;
+ 
+-- NVL2(컬럼명, 바꿀값1, 바꿀값2)
+-- 해당 컬럼이 값이 있으면 바꿀값1로 변경
+-- 해당 컬럼이 NULL이면 바꿀값2로 변경
+
+-- 보너스가 NULL인 직원은 0.5
+-- NULL 아닌 경우 0.7로 변경하여 조회
+SELECT
+       EMP_NAME
+     , BONUS
+     , NVL2(BONUS, 0.7,0.5)
+  FROM EMPLOYEE;
+ 
+-- 선택함수
+-- 여러 가지 경우에 선택할 수 있는 기능을 제공
+-- DECODE(계산식 | 컬럼명, 조건값1, 선택값1, 조건값2, 선택값2, ...)
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , EMP_NO
+     , DECODE(SUBSTR(EMP_NO,8,1),'1','남','2','여')
+  FROM EMPLOYEE;    
+
+-- 마지막 인자로 조건값 없이 선택값을 작성하면
+-- 아무것도 해당하지 않을 때 마지막에 작성한 선택값을 무조건 선택함
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , EMP_NO
+     , DECODE(SUBSTR(EMP_NO, 8, 1),'2','여','남')
+  FROM EMPLOYEE;
+
+-- 직원의 급여를 인상하고자 한다.
+-- 직급코드가 J7인 직원은 급여의 10%를 인상하고
+-- 직급코드가 J6인 직원은 급여의 15% 인상하고
+-- 직급코드가 J5인 직원은 급여의 20%를 인상함
+-- 그 외 직급의 직원은 5%만 인상
+-- 직원 테이블에서 직원명, 직급코드, 급여, 인상급여를 조회하세요
+SELECT
+       EMP_NAME
+     , JOB_CODE
+     , SALARY
+     , DECODE(JOB_CODE, 'J7', SALARY * 1.1,
+                        'J6', SALARY * 1.5,
+                        'J5', SALARY * 1.2,
+                              SALARY * 1.05) 인상급여
+  FROM EMPLOYEE;
+ 
+
+-- CASE
+--   WHEN 조건식 THEN 결과값
+--   WHEN 조건식 THEN 결과값
+--   ELSE 결과값
+--  END
+-- DECODE 대신 CASE WHEN 쓸 수 있음
+SELECT
+       EMP_NAME
+     , JOB_CODE
+     , SALARY
+     , CASE
+         WHEN JOB_CODE = 'J7' THEN SALARY * 1.1
+         WHEN JOB_CODE = 'J6' THEN SALARY * 1.15
+         WHEN JOB_CODE = 'J5' THEn SALARY * 1.2
+         ELSE SALARY * 1.05
+       END AS 인상급여
+  FROM EMPLOYEE;
+
+-- 사번, 사원명, 급여를 EMPLOYEE 테이블에서 조회하고
+-- 급여가 500만원 초과이면 '고급'
+-- 급여가 300~500만원이면 '중급'
+-- 그 이하는 '초급'으로 출력처리하고 별칭은 '구분'으로 한다
+SELECT
+       EMP_ID
+     , EMP_NAME
+     , SALARY
+     , CASE
+         WHEN SALARY > 5000000 THEN '고급'
+         WHEN SALARY <= 5000000 AND SALARY >= 3000000 THEN '중급'
+         -- WHEN SALARY BETWEEN 3000000 AND 5000000
+         ELSE '초급'
+       END AS 구분
+ -- 별칭은 ""는 괜찮지만 ''는 안 괜찮음
+  FROM EMPLOYEE;
