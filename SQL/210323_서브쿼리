@@ -1,0 +1,665 @@
+-- SUBQUERY(서브쿼리)
+-- 서브쿼리 : 쿼리문 안에서 사용된 쿼리문
+-- 사원명이 노옹철인 사람의 부서 조회
+SELECT
+       DEPT_CODE
+  FROM EMPLOYEE
+ WHERE EMP_NAME = '노옹철';
+
+-- 부서코드가 D9인 직원을 조회
+SELECT
+       EMP_NAME
+  FROM EMPLOYEE
+ WHERE DEPT_CODE = 'D9';
+ 
+-- 부서코드가 노옹철 사원과 같은 소속의 직원 명단 조회
+SELECT
+       E.EMP_NAME
+  FROM EMPLOYEE E
+ WHERE E.DEPT_CODE = (SELECT E2.DEPT_CODE
+                        FROM EMPLOYEE E2
+                       WHERE E2.EMP_NAME = '노옹철'
+                     );
+
+-- 전 직원의 평균 급여보다 많은 급여를 받고 있는 직원의 사번, 이름, 직급코드, 급여를 조회하세요.
+SELECT
+       AVG(SALARY)
+  FROM EMPLOYEE;
+
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.JOB_CODE
+     , E.SALARY
+  FROM EMPLOYEE E
+ WHERE E.SALARY >= (SELECT AVG(E2.SALARY)
+                      FROM EMPLOYEE E2
+                   );
+
+-- 서브쿼리의 유형
+-- 단일행 서브쿼리 : 서브쿼리의 조회 결과값이 1개 행일 때
+-- 다중행 서브쿼리 : 서브쿼리의 조회 결과값이 행이 여러개 일때
+-- 다중열 서브쿼리 : 서브쿼리의 조회 결과값이 컬럼이 여러개 일때
+-- 다중행 다중열 서브쿼리 : 조회 결과 행 수와 열 수가 여러개 일때
+
+-- 서브쿼리의 유형에 따라 서브쿼리 앞에 붙는 연산자가 다르다.
+-- 단일행 서브쿼리 앞에는 일반 비교 연산자 사용
+-- >, <, >= , <= , = !=/<>/^= (서브쿼리)
+
+-- 단일행 서브쿼리
+-- 노옹철 사원의 급여보다 많이 받는 직원의 
+-- 사번, 이름, 부서, 직급, 급여를 조회하세요
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.DEPT_CODE
+     , E.JOB_CODE
+     , E.SALARY
+  FROM EMPLOYEE E
+ WHERE E.SALARY > (SELECT E2.SALARY
+                     FROM EMPLOYEE E2
+                    WHERE E2.EMP_NAME = '노옹철'
+                  );
+                  
+-- 가장 적은 급여를 받는 직원의
+-- 사번, 이름, 직급, 부서, 급여, 입사일을 조회하세요.
+SELECT MIN(SALARY)
+  FROM EMPLOYEE;
+
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.DEPT_CODE
+     , E.JOB_CODE
+     , E.SALARY
+     , E.HIRE_DATE
+  FROM EMPLOYEE E
+ WHERE E.SALARY = (SELECT MIN(SALARY)
+                     FROM EMPLOYEE
+                  );
+
+-- 서브쿼리는 SELECT, FROM, WHERE, HAVING, ORDER BY 절에도 사용할 수 있다.
+-- 부서별 급여의 합계 중 가장 큰 부서의 부서명, 급여 합계를 구하세요.
+SELECT
+       D.DEPT_TITLE
+     , SUM(E.SALARY)
+  FROM EMPLOYEE E
+  LEFT JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+ GROUP BY D.DEPT_TITLE
+HAVING SUM(E.SALARY) = (SELECT MAX(SUM(E2.SALARY))
+                          FROM EMPLOYEE E2
+                         GROUP BY DEPT_CODE
+                       );
+
+-- 다중행 서브쿼리
+-- 다중행 서브쿼리 앞에서는 일반 비교연산자 사용 못한다.
+-- IN / NOT IN : 여러 개의 결과값 중에서 한 개라도 일치하는 값이 있다면,
+--              혹은 없다면 이라는 의미
+-- > ANY, < ANY : 여러 개의 결과값 중에서 한개라도 큰/ 작은 경우
+--                가장 작은값보다 크냐? 가장 큰값보다 작냐?
+-- > ALL, < ALL : 모든 값보다 큰 / 작은 경우
+--                가장 큰 값보다 크냐? / 가장 작은 값보다 작냐?
+-- EXISTS / NOT EXISTS : 서브쿼리에만 사용하는 연산자로
+--                       값이 존재하냐? / 존재하지 않느냐?
+-- 부서별 최고 급여를 받는 직원의 이름, 직급, 부서, 급여 조회
+SELECT
+       E.DEPT_CODE
+     , MAX(E.SALARY)
+  FROM EMPLOYEE E
+ GROUP BY E.DEPT_CODE;
+
+
+SELECT
+       E.EMP_NAME
+     , E.JOB_CODE
+     , E.DEPT_CODE
+     , E.SALARY
+  FROM EMPLOYEE E
+ WHERE E.SALARY IN (SELECT MAX(E.SALARY)
+                      FROM EMPLOYEE E
+                     GROUP BY E.DEPT_CODE
+                   );
+
+-- 관리자에 해당하는 직원에 대한 정보와 관리자가 아닌 직원의
+-- 정보를 추출하여 조회
+-- 사번, 이름, 부서명, 직급, '관리자' AS 구분 / '직원' AS 구분
+SELECT
+       DISTINCT E.MANAGER_ID
+  FROM EMPLOYEE E
+ WHERE E.MANAGER_ID IS NOT NULL;
+  
+
+SELECT
+       E.EMP_ID 사번
+     , E.EMP_NAME 이름
+     , D.DEPT_TITLE 부서명
+     , J.JOB_NAME 직급
+     , '관리자' AS 구분
+  FROM EMPLOYEE E
+  LEFT JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+  LEFT JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+ WHERE E.EMP_ID IN (SELECT DISTINCT E2.MANAGER_ID
+                      FROM EMPLOYEE E2
+                     WHERE E2.MANAGER_ID IS NOT NULL
+                   )
+ UNION
+SELECT
+       E3.EMP_ID 사번
+     , E3.EMP_NAME 이름
+     , D3.DEPT_TITLE 부서명
+     , J3.JOB_NAME 직급
+     , '직원' AS 구분
+  FROM EMPLOYEE E3
+  LEFT JOIN DEPARTMENT D3 ON(E3.DEPT_CODE = D3.DEPT_ID)
+  LEFT JOIN JOB J3 ON(E3.JOB_CODE = J3.JOB_CODE)
+ WHERE E3.EMP_ID NOT IN (SELECT DISTINCT E4.MANAGER_ID
+                      FROM EMPLOYEE E4
+                     WHERE E4.MANAGER_ID IS NOT NULL
+                   );
+-- 한번에 하기 힘들면 UNION으로도 가능!!
+                   
+-- SELECT 절에서도 서브쿼리를 사용할 수 있다.
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , D.DEPT_TITLE
+     , CASE
+         WHEN E.EMP_ID IN (SELECT DISTINCT E2.MANAGER_ID
+                             FROM EMPLOYEE E2
+                            WHERE E2.MANAGER_ID IS NOT NULL
+                          )
+        THEN '관리자'
+        ELSE '직원'
+      END AS 구분
+  FROM EMPLOYEE E
+  LEFT JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID);
+
+-- 대리 직급의 직원들 중에서 과장 직급의 최소 급여보다 많이 받는
+-- 직원의 사번, 이름, 직급명, 급여를 조회하세요.
+-- 단, > ANY 혹은 < ANY 연산자 사용
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , J.JOB_NAME
+     , E.SALARY
+  FROM EMPLOYEE E
+  JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+ WHERE J.JOB_NAME = '과장';
+
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , J.JOB_NAME
+     , E.SALARY
+  FROM EMPLOYEE E
+  JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+ WHERE J.JOB_NAME = '대리';
+
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , J.JOB_NAME
+     , E.SALARY
+  FROM EMPLOYEE E
+  JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+ WHERE J.JOB_NAME = '대리'
+   AND E.SALARY > ANY (SELECT E2.SALARY
+                        FROM EMPLOYEE E2
+                        JOIN JOB J2 ON(E2.JOB_CODE = J2.JOB_CODE)
+                       WHERE J2.JOB_NAME = '과장'
+                      );
+
+
+-- 차장 직급의 급여의 가장 큰 값보다 많이 받는 과장 직급의
+-- 사번, 이름, 직급, 급여를 조회하세요
+-- 단, > ALL 혹은 < ALL 연산자를 사용
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , J.JOB_NAME
+     , E.SALARY
+  FROM EMPLOYEE E
+  JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+ WHERE J.JOB_NAME = '과장'
+   AND E.SALARY > ALL (SELECT E2.SALARY
+                         FROM EMPLOYEE E2
+                         JOIN JOB J2 ON(E2.JOB_CODE = J2.JOB_CODE)
+                        WHERE J2.JOB_NAME = '차장'
+                       );
+
+SELECT
+       E.EMP_NAME
+  FROM EMPLOYEE E
+ WHERE EXISTS (SELECT E2.*
+                     FROM EMPLOYEE E2
+                    WHERE E2.EMP_ID = '200'
+                   );
+
+-- 자기 직급의 평균급여를 받고 있는 직원의 
+-- 사번, 이름, 직급코드, 급여를 조회하세요
+-- 단, 급여와 급여평균은 만원단위로 계산하세요 TRUNC(컬럼명, -5)
+SELECT
+        E.JOB_CODE
+      , TRUNC(AVG(E.SALARY), -5)
+  FROM EMPLOYEE E
+ GROUP BY E.JOB_CODE;
+
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.JOB_CODE
+     , E.SALARY
+  FROM EMPLOYEE E
+ WHERE E.SALARY IN (SELECT TRUNC(AVG(E2.SALARY), -5)
+                      FROM EMPLOYEE E2
+                     GROUP BY E2.JOB_CODE
+                    );
+-- 일치해야 하므로 IN (여러 개 중에서 하나 포함되는 게 있느냐) 
+-- 존재여부만을 보는 건 EXISTS -> True/False 둘 중 하나로 값이 나와서 전체/아무것도 출력되지 않음
+-- 개 중 하나씩 일치하는 것만 가져올 때는 IN
+
+-- 다중행 다중열 서브쿼리를 이용한 해결
+SELECT
+       E.EMP_NAME
+     , E.JOB_CODE
+     , E.SALARY
+  FROM EMPLOYEE E
+ WHERE (E.JOB_CODE, E.SALARY) IN (SELECT E2.JOB_CODE
+                                       , TRUNC(AVG(E2.SALARY), -5)
+                                    FROM EMPLOYEE E2
+                                   GROUP BY E2.JOB_CODE
+                                   );
+
+-- 266라인까지만 드래그 해서 볼 수 있음
+
+-- 다중열 서브쿼리
+-- 퇴사한 여직원과 같은 부서, 같은 직급에 해당하는
+-- 사원의 이름, 직급, 부서, 입사일을 조회
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.DEPT_CODE
+     , E.JOB_CODE
+  FROM EMPLOYEE E
+ WHERE SUBSTR(E.EMP_NO,8,1) = 2
+   AND E.ENT_YN = 'Y';
+
+
+SELECT
+       E.EMP_NAME
+     , E.JOB_CODE
+     , E.DEPT_CODE
+     , E.HIRE_DATE
+  FROM EMPLOYEE E
+ WHERE E.DEPT_CODE IN (SELECT E2.DEPT_CODE
+                         FROM EMPLOYEE E2
+                        WHERE SUBSTR(E2.EMP_NO,8,1) = 2
+                           AND E2.ENT_YN = 'Y'
+                      )
+   AND E.JOB_CODE IN(SELECT E3.JOB_CODE
+                      FROM EMPLOYEE E3
+                     WHERE SUBSTR(E3.EMP_NO,8,1) = 2
+                       AND E3.ENT_YN = 'Y'
+                     )
+   AND E.EMP_ID NOT IN(SELECT E4.EMP_ID
+                         FROM EMPLOYEE E4
+                         WHERE SUBSTR(E4.EMP_NO,8,1) = 2
+                           AND E4.ENT_YN = 'Y'
+                        );
+
+
+-- 다중열 서브쿼리로 변경
+SELECT
+       E.EMP_NAME
+     , E.JOB_CODE
+     , E.DEPT_CODE
+     , E.HIRE_DATE
+  FROM EMPLOYEE E
+ WHERE (E.DEPT_CODE, E.JOB_CODE)  IN (SELECT E2.DEPT_CODE
+                                           , E2.JOB_CODE
+                                        FROM EMPLOYEE E2
+                                       WHERE SUBSTR(E2.EMP_NO,8,1) = 2
+                                         AND E2.ENT_YN = 'Y')
+   AND E.EMP_ID NOT IN(SELECT E4.EMP_ID
+                         FROM EMPLOYEE E4
+                         WHERE SUBSTR(E4.EMP_NO,8,1) = 2
+                           AND E4.ENT_YN = 'Y'
+                        );                                      
+
+-- 서브쿼리 사용위치 : 
+-- SELECT절, FROM절, WHERE절, HAVING절, GROUP BY절, ORDER BY절
+-- DML 구문 : INSERT문, UPDATE문
+-- DDL 구문 : CREATE TABLE문, CREATE VIEW문
+
+-- FROM절에서 서브쿼리를 사용할 수 있다. : 테이블 대신 사용
+-- 인라인뷰(INLINE VIEW)라고 한다.
+-- 서브쿼리가 만든 결과 집합(RESULT SET)에 대한 출력 화면
+-- 기존에 있던 테이블을 가지고 새로운 결과 값을 가진 게 인라인뷰
+-- EMPLOYEE 테이블에서 컬럼을 2개만 가지고 새로운 뷰테이블을 만듦
+
+-- 부서의 직급평균에 있는 값이 같은 직급, 급여의 평균
+-- 이름, 직급이름, 급여를 조회
+SELECT
+       E.EMP_NAME
+     , J.JOB_NAME
+     , E.SALARY
+  FROM (SELECT E2.JOB_CODE
+             , TRUNC(AVG(E2.SALARY),-5) AS JOBAVG
+          FROM EMPLOYEE E2
+         GROUP BY E2.JOB_CODE
+       ) V
+  JOIN EMPLOYEE E ON(V.JOBAVG = E.SALARY AND E.JOB_CODE = V.JOB_CODE)
+  JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+ ORDER BY J.JOB_NAME;
+
+SELECT
+       V.EMP_NAME
+     , V.부서명
+     , V.직급이름
+  FROM (SELECT EMP_NAME
+             , DEPT_TITLE AS 부서명
+             , JOB_NAME AS 직급이름
+          FROM EMPLOYEE E
+          LEFT JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+          JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+        ) V
+-- EMPLOYEE에 조인해준 게 아니라 내가 원하는 것만 골라와서 만듦 (부서명 사용 가능)
+-- 원래의 테이블이 각자 합쳐져 하나의 테이블처럼 보이는 상태가 인라인뷰
+-- FROM 절에서 이미 한번 실행되어서 데이터를 몽땅 가지고 있음
+ WHERE V.부서명 = '인사관리부';
+
+
+-- 인라인뷰를 활용한 TOP-N 분석
+-- ORDER BY한 결과에 ROWNUM을 붙인다
+-- ROWNUM은 행 번호를 의미함
+-- ORDER BY한 다음에 ROWNUM이 붙게 하려면 서브쿼리(인라인뷰)를 사용해야 한다. **** 꼭 기억하기
+SELECT
+       ROWNUM
+     , E.EMP_NAME
+     , E.SALARY
+  FROM EMPLOYEE E
+ ORDER BY E.SALARY;
+-- FROM절 갔다가 SELECT절 갔다가 ORDER BY를 하니까 ROWNUM이 EMPLOYEE 테이블의 행의 번호를 가짐
+-- SALARY 기준으로 정렬한 행의 번호가 아님
+-- SALARY 기준으로 정렬한 테이블을 가지고(by 서브쿼리) 그걸 바탕으로 ROWNUM을 붙여야
+-- 게시판에도 ROWNUM을 맞춰줌
+
+SELECT
+       ROWNUM
+     , V.EMP_NAME
+     , V.SALARY
+  FROM (SELECT E.*
+          FROM EMPLOYEE E
+         ORDER BY E.SALARY DESC
+        )V
+ WHERE ROWNUM <= 5;
+ -- TOP 5 구할 때
+        
+-- 급여 평균 3위 안에 드는 부서의 
+-- 부서 코드와 부서명, 평균급여를 조회하세요.
+SELECT
+       ROWNUM
+     , V.DEPT_CODE
+     , V.DEPT_TITLE
+     , V.평균급여
+  FROM (SELECT DEPT_CODE
+             , DEPT_TITLE
+             , AVG(SALARY)평균급여
+          FROM EMPLOYEE E
+          JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+          GROUP BY DEPT_CODE, DEPT_TITLE
+        ) V
+ WHERE ROWNUM <= 3;
+-- FROM과 JOIN으로 묶은 테이블을 바탕으로 그룹을 묶어줘야 하므로
+-- GROUP BY 뒤에 나머지 컬럼으로 모두 묶어줘야 함
+-- FROM 뒤에 있는 서브쿼리를 바탕으로 조회하므로 서브쿼리에 필요한 내용 다 있어야
+
+SELECT
+       E.DEPT_CODE
+     , D.DEPT_TITLE
+     , AVG(E.SALARY) 평균급여
+  FROM EMPLOYEE E
+  JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+ GROUP BY E.DEPT_CODE, D.DEPT_TITLE
+ ORDER BY 평균급여 DESC;
+ -- AVG라는 그룹함수가 있어서 GROUP BY가 있어야
+ -- SELECT절에 있는 컬럼을 다 GROUP BY에 넣어야
+
+SELECT
+       V.DEPT_CODE
+     , V.DEPT_TITLE
+     , V.평균급여
+  FROM (SELECT E.DEPT_CODE
+             , D.DEPT_TITLE
+             , AVG(E.SALARY) 평균급여
+          FROM EMPLOYEE E
+          JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+         GROUP BY E.DEPT_CODE, D.DEPT_TITLE
+        ORDER BY 평균급여 DESC
+        ) V
+ WHERE ROWNUM <= 3;
+
+-- 직원 정보에서 급여를 가장 많이 받는 순으로 이름, 급여, 순위 조회
+-- RANK()함수는 동일한 순위 이후의 등수를 동일한 인원수만큼 건너뛰고
+-- 다음 순위를 계산하는 방식 19 19 21
+-- DENSE_RANK() 함수는 중복되는 순위 이후의 등수를 이후 등수로 처리 19 19 20
+SELECT
+       E.EMP_NAME
+     , E.SALARY
+     , DENSE_RANK() OVER(ORDER BY E.SALARY DESC) 순위
+  FROM EMPLOYEE E;
+
+SELECT
+       E.EMP_NAME
+     , E.SALARY
+     , RANK() OVER(ORDER BY E.SALARY DESC) 순위
+  FROM EMPLOYEE E;
+
+SELECT
+       V.*
+  FROM (SELECT EMP_NAME
+             , SALARY
+             , RANK() OVER(ORDER BY SALARY DESC) 순위
+          FROM EMPLOYEE
+        ) V
+ WHERE V.순위 <= 5;
+-- 정렬을 하는 또 다른 방법인 것 (ROWNUM, RANK() OVER(~))
+
+-- 직원테이블에서 보너스 포함한 연봉이 높은 5명의
+-- 사번, 이름, 부서명, 직급명, 입사일을 조회하세요. -- RANK()를 사용해서
+SELECT
+       (SALARY + SALARY*NVL(BONUS,0)) * 12
+  FROM EMPLOYEE;
+  
+SELECT
+        V.EMP_ID
+      , V.EMP_NAME
+      , V.DEPT_TITLE
+      , V.JOB_NAME
+      , V.연봉순위
+  FROM (SELECT
+               E.EMP_ID
+             , E.EMP_NAME
+             , D.DEPT_TITLE
+             , J.JOB_NAME
+             , E.HIRE_DATE
+             , RANK() OVER(ORDER BY (SALARY + SALARY*NVL(BONUS,0)) * 12 DESC) 연봉순위
+          FROM EMPLOYEE E
+          JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID) 
+          JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+        ) V
+ WHERE V.연봉순위 <= 5;
+-- 라인 759는 V.*으로 해줘도 안에 있는 값 다 가져옴
+
+-- WITH 이름 AS (쿼리문)
+-- 서브쿼리에 이름을 붙여주고 사용 시 이름을 사용하게 됨
+-- 인라인뷰로 사용될 서브쿼리에서 이용됨
+-- 같은 서브쿼리가 여러번 사용될 경우 중복 작성을 줄일 수 있음
+-- 실행속도도 빨라진다는 장점 있음
+
+WITH
+     TOPN_SAL
+  AS (SELECT E.EMP_ID
+           , E.EMP_NAME
+           , E.SALARY
+        FROM EMPLOYEE E
+       ORDER BY E.SALARY DESC
+     )
+
+SELECT 
+       ROWNUM
+     , T.EMP_NAME
+     , T.SALARY
+  FROM TOPN_SAL T;
+
+-- 부서별 급여 합계가 전체 급여의 총합의 20%보다 많은
+-- 부서의 부서명과, 부서별 급여 합계 조회
+SELECT
+       D.DEPT_TITLE
+     , SUM(E.SALARY)
+  FROM EMPLOYEE E
+  JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+ GROUP BY D.DEPT_TITLE
+ HAVING SUM(E.SALARY) > (SELECT SUM(E2.SALARY) * 0.2
+                           FROM EMPLOYEE E2
+                         );
+-- HAVING의 SUM(E.SALARY)는 DEPT_TITLE로 묶여진 것이고
+-- SELECT의 SUM(E2.SALARY)는 전체 급여의 총합임
+
+-- 인라인 뷰 사용
+-- 그룹바이에서 해빙절 해도 되고, 인라인뷰를 사용해도 됨
+SELECT
+       V.DEPT_TITLE
+     , v.SSAL
+  FROM (SELECT D.DEPT_TITLE
+              , SUM(E.SALARY) SSAL
+          FROM EMPLOYEE E
+          LEFT JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+         GROUP BY D.DEPT_TITLE
+        ) V
+ WHERE V.SSAL > (SELECT SUM(E2.SALARY) * 0.2
+                   FROM EMPLOYEE E2
+                 );
+
+-- WITH 사용
+-- 인라인뷰를 WITH로 바꿀 수 있음
+WITH
+     TOTAL_SAL
+  AS (SELECT D.DEPT_TITLE
+              , SUM(E.SALARY) SSAL
+          FROM EMPLOYEE E
+          LEFT JOIN DEPARTMENT D ON(E.DEPT_CODE = D.DEPT_ID)
+         GROUP BY D.DEPT_TITLE
+     )
+
+SELECT 
+       DEPT_TITLE
+     , SSAL
+  FROM TOTAL_SAL
+ WHERE SSAL > (SELECT SUM(E2.SALARY) * 0.2
+                   FROM EMPLOYEE E2
+                 );
+
+-- WITH로 서브쿼리 여러 개 저장
+-- ,를 통해 두 개의 값(인라인뷰)을 동시에 사용 가능
+WITH
+     SUM_SAL
+  AS (SELECT SUM(E.SALARY)
+        FROM EMPLOYEE E
+     )
+    , AVG_SAL
+  AS (SELECT AVG(E2.SALARY)
+        FROM EMPLOYEE E2
+     )
+
+SELECT
+       S.*
+  FROM SUM_SAL S
+ UNION 
+SELECT A.*
+  FROM AVG_SAL A;
+        
+
+-- 상[호연]관 서브쿼리
+-- 일반적으로는 서브쿼리가 만든 결과값을 메인쿼리가 비교 연산
+-- 메인쿼리가 사용하는 테이블의 값을 서브쿼리가 이용해서 결과를 만든다.
+-- 메인쿼리(원본)의 테이블 값이 변경되면, 서브쿼리(연결되어 있음)의 결과값도 바뀌게 된다.
+-- 별도의 테이블을 가져다 쓸 떄는 서브쿼리에 따라 값이 만들어짐
+-- but 상호연관 서브쿼리는 두 개가 연결되어 있기 때문에 참조하는 서브쿼리의 값도 바뀜
+-- 메인테이블의 값을 참조하고 있는 게 상관 서브쿼리 (서로 연결됨)
+
+-- 관리자 사번이 EMPLOYEE 테이블에 존재하는 직원에 대한 조회
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.DEPT_CODE
+     , E.MANAGER_ID
+  FROM EMPLOYEE E
+ WHERE EXISTS(SELECT E2.EMP_ID
+                FROM EMPLOYEE E2
+               WHERE E.MANAGER_ID = E2.EMP_ID
+              );     
+        
+-- 스칼라 서브쿼리
+-- 단일행 서브쿼리 + 상관쿼리
+-- SELECT절, WHERE절, ORDER BY절 사용 가능
+
+-- WHERE절에서 스칼라 서브쿼리 이용
+-- 동일 직급의 급여 평균보다 급여를 많이 받고 있는 직원의
+-- 사번, 직급코드, 급여를 조회하세요.
+
+SELECT
+       E.EMP_NAME
+     , E.JOB_CODE
+     , E.SALARY
+  FROM EMPLOYEE E
+ WHERE SALARY > (SELECT TRUNC(AVG(E.SALARY),-5)
+                   FROM EMPLOYEE M
+                  WHERE E.JOB_CODE = M.JOB_CODE
+                 );
+-- WHERE절(line 615)에 대한 서브쿼리
+
+
+-- SELECT절에서 스칼라 서브쿼리 이용
+-- MANAGER_ID에서 이름을 찾아낼 건데, 있으면 기존테이블 값을 참조해서 이름을 가지고 옴
+-- 기존테이블에 값이 없으면 '없음')
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.MANAGER_ID
+     , NVL((SELECT M.EMP_NAME
+              FROM EMPLOYEE M
+             WHERE E.MANAGER_ID = M.EMP_ID
+            ), '없음')
+  FROM EMPLOYEE E;
+
+
+-- ORDER BY절에서 스칼라 서브쿼리 이용
+-- 모든 직원의 사번, 이름, 소속부서 조회
+-- 단, 부서명 내림차순 정렬
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , E.DEPT_CODE
+  FROM EMPLOYEE E
+ ORDER BY (SELECT D.DEPT_TITLE
+             FROM DEPARTMENT D
+            WHERE E.DEPT_CODE = D.DEPT_ID
+           ) DESC NULLS FIRST;
+-- NULLS FIRST, LAST 통해서 NULL의 위치도 조정 가능
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
