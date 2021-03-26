@@ -523,14 +523,14 @@ SELECT TCODE
      , TCONTENTS
   FROM TT;
 
--- WITH CHECK 옵션 : 컬럼의 값을 수정하지 못하게 한다.
+-- WITH CHECK OPTION : 컬럼의 값을 수정하지 못하게 한다.
 -- WITH CHECK OPTION : 조건절에 사용된 컬럼의 값을 수정하지 못하게 한다.
 --                     (WHERE MANAGER_ID = '200')
 CREATE OR REPLACE VIEW V_EMP3
 AS
 SELECT E.*
   FROM EMPLOYEE E
- WHERE MANAGER_ID = '200'
+ WHERE MANAGER_ID = '200' -- 변경 못하는 것!
   WITH CHECK OPTION;
 
 SELECT
@@ -556,4 +556,12 @@ DELETE
 SELECT
        V.*
   FROM V_DEPT V;
+
+
+
+
+
+
+
+
 
