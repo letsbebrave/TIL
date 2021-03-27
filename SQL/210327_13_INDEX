@@ -1,0 +1,218 @@
+-- 인덱스(INDEX)
+-- : SQL 명령문의 "검색 처리 속도를 향상"시키기 위해
+--   컬럼에 대해서 생성하는 오라클 객체이다.
+
+-- 하드디스크의 어느 위치인지에 대한 정보를 가진 주소록
+-- DATA_ROWID로 구성(데이터는 모두 ROWID로 구성되어 있음)
+-- AAAE7UAABAAALC5AAA
+-- 오브젝트 번호,파일번호,BLOCK번호,ROW번호
+
+-- 인덱스의 내부 구조는 이진트리 형식으로 구성되어 있고
+-- 인덱스를 생성하기 위해서는 시간이 필요하다.
+-- 또한 인덱스를 위한 추가 저장공간이 필요하기 때문에 반드시 좋은 것은 아니다.
+-- => 인덱스가 생성된 컬럼에서 DML(ISERT,UPDATE,DELETE)작업이 빈번한 경우 처리속도가 느려짐
+
+-- 장점
+-- 검색 속도가 빨라진다.
+-- 시스템에 걸리는 부하를 줄여서 시스템 전체의 성능을 향상시킴
+
+-- 단점
+-- 인덱스를 위한 추가 저장공간이 필요
+-- 인덱스 생성하는데 시간이 걸림
+-- 인덱스 변경이 자주 일어나는 경우 인덱스를 다시 만드는 REBUILD 작업을 추가적으로 해줘야 하고,
+-- REBUILD를 자주 해주지 않으면 성능이 오히려 저하됨
+
+-- 인덱스를 관리하는 데이터 딕셔너리 테이블
+-- 인덱스 부여한 컬럼을 찾아감 그리고 조회함
+SELECT
+       UTC.*
+  FROM USER_IND_COLUMNS UTC;
+
+-- 행을 찾아가기 위한 "가상 컬럼"이 존재 (ROWID)
+SELECT
+       ROWID
+     , EMP_ID
+     , EMP_NAME
+  FROM EMPLOYEE;
+
+-- 인덱스 종류
+-- 1. 고유인덱스(UNIQUE INDEX)
+-- 2. 비고유인덱스(NONUNIQUE INDEX)
+-- 3. 단일인덱스(SINGLE INDEX)
+-- 4. 결합인덱스(COMPOSITE INDEX)
+-- 5. 함수 기반 인덱스(FUNCTION BASED INDEX)
+
+-- TABLE FULL SCAN
+SELECT 
+       *
+  FROM EMPLOYEE;
+
+-- UNIQUE INDEX
+-- UNIQUE INDEX로 생성된 컬럼에는 중복값이 포함될 수 없다.
+-- 오라클 PRIMARY KEY 제약조건을 생성하면 자동으로 해당 컬럼에 UNIQUE INDEX가 생성됨
+-- PRIMARY KEY를 이용하여 ACCESS하는 경우에 성능 향상의 효과가 있음
+-- UNIQUE INDEX 활용
+
+-- TABLE FULL SCAN
+SELECT 
+       *
+  FROM EMPLOYEE;
+
+-- UNIQUE INDEX 활용
+SELECT /*+ INDEX_DESC(EMPLOYEE 엔터티1_PK) */
+       *
+  FROM EMPLOYEE
+ WHERE EMP_ID > '0'; -- EMP_ID에 대한 오름차순 정렬
+
+SELECT 
+       *
+  FROM USER_IND_COLUMNS
+ WHERE TABLE_NAME = 'EMPLOYEE';
+
+
+CREATE UNIQUE INDEX IDX_EMPNO
+ON EMPLOYEE(EMP_NO);
+
+SELECT
+       *
+  FROM USER_IND_COLUMNS
+ WHERE TABLE_NAME = 'EMPLOYEE';
+
+-- 중복값이 있는 컬럼은 UNIQUE 인덱스를 생성하지 못함
+CREATE UNIQUE INDEX IDX_DEPTCODE
+ON EMPLOYEE(DEPT_CODE);
+
+-- NONUNIQUE INDEX
+-- WHERE절에서 빈번하게 사용되는 일반 컬럼(DEPT_CODE같은 것)을 대상으로 생성
+-- 주로 성능 향상을 위한 목적으로 생성됨
+CREATE INDEX IDX_DEPTCODE
+ON EMPLOYEE(DEPT_CODE);
+
+SELECT
+       *
+  FROM USER_IND_COLUMNS
+ WHERE TABLE_NAME = 'EMPLOYEE';
+
+SELECT
+       *
+  FROM EMPLOYEE
+ WHERE DEPT_CODE = 'D9';
+
+-- 결합인덱스(COMPOSITE INDEX)
+-- 부서코드와 급여가 같은 사람을 묶어서 조회를 자주하면 
+-- 해당 조건에 대한 컬럼 두 개를 묶어놓고 조건절에 넣으면 결합인덱스
+CREATE INDEX IDX_DEPT
+ON DEPARTMENT(DEPT_ID, DEPT_TITLE);
+-- IDX_DEPT라는 타이틀로 한 데 묶여있음
+
+SELECT
+       *
+  FROM USER_IND_COLUMNS
+ WHERE TABLE_NAME = 'EMPLOYEE';
+
+SELECT
+       *
+  FROM DEPARTMENT;
+
+SELECT
+       *
+  FROM DEPARTMENT
+ WHERE DEPT_TITLE > '0'; -- 해당 컬럼에 대한 오름차순 정렬
+
+SELECT /*+ INDEX_DESC(DEPARTMENT IDX_DEPT) */
+       *
+  FROM DEPARTMENT
+ WHERE DEPT_TITLE > '0'
+   AND DEPT_ID > '0';
+
+-- 인덱스 힌트
+-- 일반적으로는 옵티마이저가 적절한 인덱스를 타거나
+-- 풀 스캐닝을 해서 비용이 적게 드는 효율적인 방식으로 검색 함
+-- 하지만 우리는 원하는 테이블에 있는 인덱스를 사용할 수 있게 해주는 구문(힌트)를 통해 선택 가능
+-- SELECT절 첫 줄에 힌트 주석(/*+ 내용 */)을 작성하여 적절한 인덱스를 부여할 수 있음
+-- 주의 : 주석에 '+'를 반드시 붙이고 /* + 다음에 스페이스를 반드시 줘야 한다.
+
+--/*+ INDEX_DESC(DEPARTMENT IDX_DEPT) */
+--       *
+
+
+-- 함수 기반 인덱스
+-- SELECT절이나 WHERE절에서 산술계산식이나 함수가 사용된 경우
+-- 계산에 포함된 컬럼은 인덱스에 적용받지 않음
+-- 계산식으로 검색하는 경우가 많다면, 수식이나 함수식으로 이루어진 컬럼을
+-- 인덱스로 만들 수도 있다.
+
+-- EMPLOYEE 테이블의 EMP_NAME컬럼에 대해서 IDX_ENM이라는 이름의 UNIQUE INDEX 생성
+CREATE UNIQUE INDEX IDX_ENM
+ON EMPLOYEE(EMP_NAME); 
+
+SELECT 
+       *
+  FROM USER_IND_COLUMNS
+ WHERE TABLE_NAME = 'EMPLOYEE';
+ 
+-- 새 직원 정보를 EMPLOYEE에 추가
+-- UNIQUE INDEX를 지정한 경우 중복된 값을 저장할 수 없다.
+INSERT
+  INTO EMPLOYEE
+VALUES
+(
+  888
+, '노옹철'
+, '888888-1234567'
+, 'test01@gmail.com'
+, '01012345678'
+, 'D1'
+, 'J7'
+, 'S1'
+,  9000000
+,  0.1
+,  NULL
+,  SYSDATE
+,  NULL
+,  DEFAULT
+);
+--  unique constraint (EMPLOYEE.IDX_ENM) violated
+
+-- EMPLOYEE 테이블을 복사해서 EMP01, EMP02 테이블 생성
+-- EMP01테이블의 EMP_ID 컬럼에 대해서 UNIQUE INDEX 생성 : IDX_EID
+-- EMP01, EMP02 테이블에서 EMP_ID가 201번인 직원 조회
+CREATE TABLE EMP01
+AS
+SELECT * FROM EMPLOYEE;
+
+CREATE TABLE EMP02
+AS
+SELECT * FROM EMPLOYEE;
+
+CREATE UNIQUE INDEX IDX_EID
+ON EMP01(EMP_ID); 
+
+SELECT
+       *
+  FROM EMP01
+ WHERE EMP_ID = 201;
+ 
+SELECT
+       *
+  FROM EMP02
+ WHERE EMP_ID = 201;
+
+SELECT
+       E.*
+  FROM EMPLOYEE E;
+
+CREATE INDEX IDX_EMP02_SALCALC
+ON EMPLOYEE ((SALARY + (SALARY * NVL(BONUS,0))) * 12);
+
+-- 인덱스 삭제
+DROP INDEX IDX_EMP02_SALCALC;
+
+SELECT /*+ INDEX_DESC(EMPLOYEE IDX_EMP02_SALCALC)*/
+       EMP_ID
+     , EMP_NAME
+     , ((SALARY + (SALARY * NVL(BONUS,0))) * 12) 연봉
+  FROM EMPLOYEE
+ WHERE ((SALARY + (SALARY * NVL(BONUS,0))) * 12) > 10000000;
+
+
