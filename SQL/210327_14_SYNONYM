@@ -25,13 +25,15 @@ SELECT
 -- [참고]
 -- 관리자 계정(system계정)에서 실행할 내용
 GRANT CREATE SYNONYM TO EMPLOYEE;
-CREATE PUBLIC SYNONYM DEPT FOR EMPLOYEE.DEPARTMENT;
+CREATE PUBLIC SYNONYM DEPT FOR EMPLOYEE.DEPARTMENT
+DROP PUBLIC SYNONYM DEPT;
 
 SELECT 
        D.*
   FROM EMPLOYEE.DEPARTMENT D;
 -- 다른 사용자가 테이블에 접근할 경우 '사용자명.테이블명'
 -- PUBLIC으로 해주고 싶으면 선언해야! (관리자 테이블에서 해야!)
+-- EMPLOYEE 가 아닌 다른 계정에서 접속하고 싶을 때 동의어 설정 to PUBLIC
 
 SELECT
        E.*
@@ -41,9 +43,10 @@ SELECT
        D.*
   FROM DEPT D;
 
-
-
-
+-- SYNONYM 삭제
+DROP SYNONYM EMP; -- 가능
+DROP SYNONYM DEPT; -- 불가능 (관리자 계정에서 삭제해야!)
+                   -- DROP PUBLIC SYNONYM DEPT;
 
 
 
