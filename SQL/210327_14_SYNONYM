@@ -1,0 +1,49 @@
+-- 동의어(SYNONYM)
+-- 다른 데이터베이스가 가진 객체에 대한 별명 혹은 줄임말
+-- 여러 사용자가 테이블을 공유할 경우,
+-- 다른 사용자가 테이블에 접근할 경우 '사용자명.테이블명'으로 표현
+-- but 동의어를 사용하면 간단하게 사용 가능
+
+-- 생성방식
+-- CREATE SYNONYM 줄임말 FOR 사용자명.객체명;
+CREATE SYNONYM EMP FOR EMPLOYEE;
+-- 시스템 계정에서 GRANT CREATE SYNONYM TO EMPLOYEE; 동의어 생성 권한 준 후에 생성 가능
+
+SELECT
+       E.*
+  FROM EMP E;
+-- EMPLOYEE 조회 시에 대신 EMP를 해줘도 사용 가능
+
+-- 동의어의 구분
+-- 1. 비공개 동의어
+-- 객체에 대한 접근 권한을 부여받은 사용자가 정의한 동의어
+-- 2. 공개 동의어
+-- 모든 권한을 주는 사용자(DBA)가 정의한 동의어
+-- 모든 사용자가 사용 가능(PUBLIC)
+-- ex) DUAL
+
+-- [참고]
+-- 관리자 계정(system계정)에서 실행할 내용
+GRANT CREATE SYNONYM TO EMPLOYEE;
+CREATE PUBLIC SYNONYM DEPT FOR EMPLOYEE.DEPARTMENT;
+
+SELECT 
+       D.*
+  FROM EMPLOYEE.DEPARTMENT D;
+-- 다른 사용자가 테이블에 접근할 경우 '사용자명.테이블명'
+-- PUBLIC으로 해주고 싶으면 선언해야! (관리자 테이블에서 해야!)
+
+SELECT
+       E.*
+  FROM EMP E;
+
+SELECT
+       D.*
+  FROM DEPT D;
+
+
+
+
+
+
+
