@@ -1,0 +1,61 @@
+-- FUNCTION
+-- 프로시져와 사용 용도가 거의 비슷
+-- 실행결과를 되돌려 받을 수 있음 (RETURN)
+CREATE OR REPLACE FUNCTION BONUS_CALC
+(
+  V_EMP EMPLOYEE.EMP_ID%TYPE
+)
+RETURN NUMBER
+IS
+   V_SAL EMPLOYEE.SALARY%TYPE;
+   V_BONUS EMPLOYEE.BONUS%TYPE;
+   CALC_SAL NUMBER;
+BEGIN
+  SELECT E.SALARY
+       , NVL(E.BONUS, 0)
+    INTO V_SAL
+       , V_BONUS
+    FROM EMPLOYEE E
+   WHERE E.EMP_ID = V_EMP;
+
+   CALC_SAL := (V_SAL + (V_SAL * V_BONUS)) * 12;
+   -- 보너스를 포함한 연봉
+   
+   RETURN CALC_SAL;
+END;
+/
+
+VARIABLE VAR_CALC NUMBER;
+
+EXEC :VAR_CALC := BONUS_CALC('&EMP_ID');
+               -- 함수를 요청하면 그 계산 값이 리턴됨 VAR_CALC 그리고 바인드 변수에 담아줌
+PRINT VAR_CALC;
+
+
+SELECT
+       E.EMP_ID
+     , E.EMP_NAME
+     , BONUS_CALC(E.EMP_ID)
+       -- 매개변수로 EMP_ID를 넣어줌 (계산 결과인 연봉을 넣어줌)
+  FROM EMPLOYEE E
+ WHERE BONUS_CALC(E.EMP_ID) > 30000000;
+
+-- PROCEDURE과 함수의 다른점
+-- 함수엔 매개변수를 넣으면 반환값 반환 but PROCEDURE은 특정 형식에 값을 넣어줘야 함
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
