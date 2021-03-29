@@ -1,0 +1,97 @@
+-- CURSOR
+-- 처리결과가 여러 개의 행으로 구해지는 SELECT문을 처리하기 위해
+-- 처리결과를 저장해 놓은 객체이다
+-- (RESULT SET에서 CURSOR를 통해 커서의 내용을 하나씩 뽑아온다)
+-- CURSOR ~ OPEN ~ FETCH ~ CLOSE 단계로 진행됨
+
+-- CURSOR의 상태
+-- %NOTFOUND : 커서 영역의 자료가 모두 인출(FETCH)되어
+--             다음 영역이 존재하지 않으면 TRUE
+-- %FOUND : 커서 영역에 자료가 아직 있으면 TRUE
+-- %ISOPEN : 커서가 OPEN된 상태면 TRUE
+-- %ROWCOUNT : 커서가 얻어온 레코드의 갯수
+CREATE OR REPLACE PROCEDURE CURSOR_DEPT
+IS
+  V_DEPT DEPARTMENT%ROWTYPE;
+  CURSOR C1
+  -- 조회된 결과값을 C1에 담아줌, C1이라는 객체를 만들어서 리스트 형태로 담고 있다.
+  IS
+  SELECT D.*
+    FROM DEPARTMENT D;
+BEGIN
+  OPEN C1;
+  LOOP
+    FETCH C1
+    -- 첫번째 행을 꺼내온다
+     INTO V_DEPT.DEPT_ID
+        , V_DEPT.DEPT_TITLE
+        , V_DEPT.LOCATION_ID;
+    EXIT WHEN C1%NOTFOUND;
+    
+    DBMS_OUTPUT.PUT_LINE('부서코드 : ' || V_DEPT.DEPT_ID || ', 부서명 : ' || V_DEPT.DEPT_TITLE || ', 지역 : ' || V_DEPT.LOCATION_ID);
+  END LOOP;
+  CLOSE C1;
+END;
+/
+  
+EXEC CURSOR_DEPT;
+
+-- 출력값 안 나오면 SET SERVEROUTPUT ON; 써줘야
+
+-- FOR K IN () LOOP와 퉁쳐줄 수 있음 (OPEN, FETCH, CLOSE)
+-- FOR IN LOOP를 이용하면 반복 시에 자동으로 CURSOR OPEN을 하고 
+-- 인출(FETCH)도 자동으로 한다.
+-- LOOP문이 종료될 때 자동으로 CLOSE한다.
+CREATE OR REPLACE PROCEDURE CURSOR_DEPT
+IS
+  V_DEPT DEPARTMENT%ROWTYPE;
+  CURSOR C1
+  -- 조회된 결과값을 C1에 담아줌, C1이라는 객체를 만들어서 리스트 형태로 담고 있다.
+  IS
+  SELECT D.*
+    FROM DEPARTMENT D;
+BEGIN
+   FOR V_DEPT IN C1 LOOP
+   -- V_DEPT에 for의 한 행을 다 넣어줌
+    
+    DBMS_OUTPUT.PUT_LINE('부서코드 : ' || V_DEPT.DEPT_ID || ', 부서명 : ' || V_DEPT.DEPT_TITLE || ', 지역 : ' || V_DEPT.LOCATION_ID);
+  
+  END LOOP;
+END;
+/
+
+EXEC CURSOR_DEPT;
+
+
+------------- 더 줄이기 -------------
+------------- CURSOR라는 개념을 명시적으로 사용하지 않고도---------
+-- 해당 조건으로 실행했을 때 결과값을 덩어리로 받아오고 하나씩 꺼내온다
+-- 커서라는 개념이 해당 객체 안 에 있고 출력값을 쓸 수 있다. 
+-- 분할해서
+-- CURSOR 정의
+-- 축약해서 FOR IN 을 서브쿼리로 넣어줌
+
+CREATE OR REPLACE PROCEDURE CURSOR_DEPT
+IS
+  V_DEPT DEPARTMENT%ROWTYPE;
+
+  -- 조회된 결과값을 C1에 담아줌, C1이라는 객체를 만들어서 리스트 형태로 담고 있다.
+
+BEGIN
+   FOR V_DEPT IN (SELECT D.* FROM DEPARTMENT D) LOOP
+   -- V_DEPT에 for의 한 행을 다 넣어줌
+    
+    DBMS_OUTPUT.PUT_LINE('부서코드 : ' || V_DEPT.DEPT_ID || ', 부서명 : ' || V_DEPT.DEPT_TITLE || ', 지역 : ' || V_DEPT.LOCATION_ID);
+  
+  END LOOP;
+END;
+/
+
+
+
+
+
+
+
+
+
