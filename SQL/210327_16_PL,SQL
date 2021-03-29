@@ -282,6 +282,191 @@ END;
 /
 
 
+CREATE TABLE TEST1(
+  BUNHO NUMBER(3),
+  NALJJA DATE
+);
+
+BEGIN
+  FOR I IN 1..10
+  -- 1부터 10까지 범위가 지정됨
+  -- IT EXIT 처럼 나가게 해줄 필요가 없다
+  LOOP
+   INSERT
+     INTO TEST1
+     (
+       BUNHO
+     , NALJJA
+     )
+     VALUES
+     (
+       I
+     , SYSDATE
+     );
+  END LOOP;
+END;
+/
+
+SELECT
+       T.*
+  FROM TEST1 T;
+
+
+-- 구구단 짝수단 출력하기
+-- 계산 결과는 변수에 따로 담아야 함
+DECLARE 
+    RESULT NUMBER;
+BEGIN
+  FOR DAN IN 2..9
+    LOOP
+      IF MOD(DAN,2) = 0
+        THEN FOR SU IN 1..9
+        LOOP
+         RESULT := DAN * SU;
+         DBMS_OUTPUT.PUT_LINE(DAN || '*' || SU || '=' || RESULT);
+        END LOOP;
+        DBMS_OUTPUT.PUT_LINE(' ');
+      END IF;
+    END LOOP;
+END;
+/
+
+
+DECLARE
+  RESULT NUMBER;
+  DAN NUMBER := 2;
+  SU NUMBER;
+  -- 기본값을 초기화
+BEGIN
+  WHILE DAN <= 9
+  LOOP
+    SU := 1;
+    IF MOD(DAN,2) = 0
+      THEN WHILE SU <= 9
+      LOOP
+        RESULT := DAN * SU;
+        DBMS_OUTPUT.PUT_LINE(DAN || ' * ' || SU || ' = ' || RESULT);
+        SU := SU + 1;
+      END LOOP;
+     END IF;
+     DAN := DAN + 1;
+  END LOOP;
+END;
+/
+
+-- 테이블 타입의 변수 선언 및 값 대입 출력
+-- BINARY_INTEGER 로만 INDEX 선언 가능
+DECLARE
+  TYPE EMP_ID_TABLE_TYPE IS TABLE OF EMPLOYEE.EMP_ID%TYPE
+  INDEX BY BINARY_INTEGER;
+    -- TYPE을 새롭게 하나 만듦
+  TYPE EMP_NAME_TABLE_TYPE IS TABLE OF EMPLOYEE.EMP_NAME%TYPE
+  INDEX BY BINARY_INTEGER;
+
+  EMP_ID_TABLE EMP_ID_TABLE_TYPE;
+  EMP_NAME_TABLE EMP_NAME_TABLE_TYPE;
+  
+  INDEX BY BINARY_INTEGER := 0;
+   
+BEGIN
+  I := 1;
+  FOR K IN (SELECT EMP_ID, EMP_NAME FROM EMPLOYEE) LOOP
+  -- 범위 지정을 SELECT절로 했음
+   EMP_ID_TABLE(I) := K.EMP_ID;
+   -- 1차원 배열 : 조회한 값을 하나씩 대입해줌
+   -- 선언하고 초기화(값 대입)만 한 것 -> 내용을 보려면 꺼내서 출력해줘야
+   EMP_NAME_TABLE(I) := K.EMP_NAME;
+   I := I + 1;
+  END LOOP;
+  FOR J IN 1..I-1 LOOP
+    DBMS_OUTPUT.PUT_LINE('EMP_ID : ' || EMP_ID_TABLE(J) || ', EMP_NAME : ' || EMP_NAME_TABLE(J));
+  END LOOP;
+END;
+
+
+-- 레코드 타입의 변수 선언 및 값 대입 출력
+DECLARE
+  TYPE EMP_RECORD_TYPE IS RECORD(
+    EMP_ID EMPLOYEE.EMP_ID%TYPE,
+    EMP_NAME EMPLOYEE.EMP_NAME%TYPE,
+    DEPT_TITLE DEPARTMENT.DEPT_TITLE%TYPE,
+    JOB_NAME JOB.JOB_NAME%TYPE
+  );
+  
+  EMP_RECODE EMP_RECORD_TYPE;
+BEGIN
+  SELECT E.EMP_ID
+       , E.EMP_NAME
+       , D.DEPT_TITLE
+       , J.JOB_NAME
+    INTO EMP_RECODE
+    FROM EMPLOYEE E
+    LEFT JOIN DEPARTMENT D ON (E.DEPT_CODE = D.DEPT_ID)
+    LEFT JOIN JOB J ON(E.JOB_CODE = J.JOB_CODE)
+   WHERE E.EMP_NAME = '&EMP_NAME';
+
+  DBMS_OUTPUT.PUT_LINE('사번 : ' || EMP_RECODE.EMP_ID);
+  DBMS_OUTPUT.PUT_LINE('이름 : ' || EMP_RECODE.EMP_NAME);
+  DBMS_OUTPUT.PUT_LINE('부서 : ' || EMP_RECODE.DEPT_TITLE);
+  DBMS_OUTPUT.PUT_LINE('직급 : ' || EMP_RECODE.JOB_NAME);
+  
+END;
+/
+
+
+-- 예외처리 EXCEPTION
+-- [사용형식]
+/* EXCEPTION
+     WHEN 예외명 THEN 처리문장1
+     WHEN 예외명 TEHN 처리문장2
+     WHEN 예외명 OR 예외2 THEN 처리문장3
+     WHEN OTHERS THEN 처리문장 4
+   END;
+
+
+   오라클에서 제공하는 대표적인 예외명
+   NO_DATA_FOUND : SELECT문의 결과가 없을 떄
+   CASE_NOT_FOUND : CASE 문장에 ELSE도 없고, WHEN 조건에 일치하는 결과가 하나도 존재하지 않을 경우
+   DUP_VAL_ON_INDEX : UNIQUE 인덱스가 적용된 컬럼에 중복값을 넣으려고 할 경우
+                      (원래는 중복된 값이 UNIQUE인덱스에 못 들어감)
+
+*/
+
+-- 예외엔 정해진 값도 있고 정해지지 않은 값도 있음
+
+BEGIN
+  UPDATE EMPLOYEE
+     SET EMP_ID = '&사번'
+   WHERE EMP_ID = 200;
+  EXCEPTION
+    WHEN DUP_VAL_ON_INDEX
+    THEN DBMS_OUTPUT.PUT_LINE('이미 존재하는 사번입니다.');
+END;
+/
+
+-- 정의되지 않은 예외처리 (이름을 바꿀 수도 있음)
+DECLARE
+  DUP_EMPNO EXCEPTION;
+  PRAGMA EXCEPTION_INIT(DUP_EMPNO, -00001);
+  -- 에러 코드를 넣어준 것
+BEGIN
+  UPDATE EMPLOYEE
+     SET EMP_ID = '&사번'
+   WHERE EMP_ID = 200;
+  EXCEPTION
+    WHEN DUP_EMPNO
+    THEN DBMS_OUTPUT.PUT_LINE('이미 존재하는 사번입니다.');
+END;
+/
+
+
+
+
+
+
+
+
+
 
 
 
