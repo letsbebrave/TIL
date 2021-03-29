@@ -9,6 +9,10 @@
 -- 실행부 : BEGIN으로 시작, 제어문, 반복문, 함수의 정의 등 로직 작성
 -- 예외처리부 : EXCEPTION으로 시작, 예외처리 내용 작성
 
+-- SELECT에선 조건문(IF ELSIF)을 쓸 수 없지만
+-- PL/SQL에선 변수선언, 조건문, 반복문, 입력받을 수도 있으므로 JOIN 안 쓰고도 다양한 구현 가능
+
+
 BEGIN
   DBMS_OUTPUT.PUT_LINE('HELLO WORLD');
 END;
@@ -29,7 +33,256 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE('EMP_NAME : ' || EMP_NAME);
 
 END;
-//4
+/
+
+
+-- 레퍼런스 변수의 선언과 초기화, 변수값 출력
+DECLARE
+  EMP_ID EMPLOYEE.EMP_ID%TYPE;
+  EMP_NAME EMPLOYEE.EMP_NAME%TYPE;
+  -- %TYPE으로 레퍼런스 변수의(한 행의) 타입을 그대로 이어받음
+BEGIN
+  SELECT E.EMP_ID
+       , E.EMP_NAME
+    INTO EMP_ID
+       , EMP_NAME
+    FROM EMPLOYEE E
+   WHERE E.EMP_ID = '&EMP_ID';
+   -- 201 넣으면 SELECT 으로 조회되고 조회된 값을 INTO로 넣어줌
+   -- &는 창을 띄우는 대체변수에 대한 것
+   DBMS_OUTPUT.PUT_LINE('EMP_ID : ' || EMP_ID);
+   DBMS_OUTPUT.PUT_LINE('EMP_NAME : ' || EMP_NAME);
+END;
+/ 
+
+
+-- 레퍼런스 변수로 EMP_ID, EMP_NAME, DEPT_CODE, JOB_CODE, SALARY를 선언하고
+-- EMPLOYEE 테이블에서 사번, 이름, 직급코드, 부서코드, 급여를 조회하여
+-- 선언한 레퍼런스 변수에 담아 출력하세요
+-- 단, 입력받은 이름과 일치하는 조건의 직원을 조회하세요
+DECLARE
+  EMP_ID EMPLOYEE.EMP_ID%TYPE;
+  EMP_NAME EMPLOYEE.EMP_NAME%TYPE;
+  DEPT_CODE EMPLOYEE.DEPT_CODE%TYPE;
+  JOB_CODE EMPLOYEE.JOB_CODE%TYPE;
+  SALARY EMPLOYEE.SALARY%TYPE;
+-- DECLARE엔 레퍼런스 변수 선언
+BEGIN
+  SELECT E.EMP_ID
+       , E.EMP_NAME
+       , E.DEPT_CODE
+       , E.JOB_CODE
+       , E.SALARY
+    INTO EMP_ID
+       , EMP_NAME
+       , DEPT_CODE
+       , JOB_CODE
+       , SALARY
+       -- 조회(SELECT)하고 선언해놓은 변수에 집어넣겠다(INTO)는 것
+    FROM EMPLOYEE E
+   WHERE E.EMP_NAME = '&EMP_NAME';
+   -- 이름 넣으면 SELECT 으로 조회되고 출력된 값을 INTO로 넣어줌
+   -- &는 창을 띄우는 대체변수에 대한 것
+   DBMS_OUTPUT.PUT_LINE('EMP_ID : ' || EMP_ID);
+   DBMS_OUTPUT.PUT_LINE('EMP_NAME : ' || EMP_NAME);
+   DBMS_OUTPUT.PUT_LINE('DEPT_CODE : ' || DEPT_CODE);
+   DBMS_OUTPUT.PUT_LINE('JOB_CODE : ' || JOB_CODE);
+   DBMS_OUTPUT.PUT_LINE('SALARY : ' || SALARY);
+      -- INTO로 변수에 넣어준 값을 출력
+END;
+/ 
+-- BEGIN END 조회문 (BEGIN을 쓰면 END;를 바로 써주기)
+
+DESC EMPLOYEE;
+
+
+-- 한 컬럼의 데이터 타입을 가져올 때 %TYPE
+-- 한 테이블의 전체 데이터 타입을 가져올 때 %ROWTYPE
+
+-- %ROWTYPE 
+-- 테이블의 한 행의 모든 컬럼과 자료형을 참조하는 경우 사용
+DECLARE
+  EMP EMPLOYEE%ROWTYPE;
+  -- EMPLOYEE 테이블이 가지고 있는 모든 컬럼의 데이터 타입이 EMP에 속성값으로 넣어짐
+  -- EMP.EMP_ID 이런 식으로 쓸 수 있음
+BEGIN
+  SELECT E.*
+    INTO EMP
+    FROM EMPLOYEE E
+   WHERE E.EMP_ID = '&EMP_ID';
+   DBMS_OUTPUT.PUT_LINE('EMP_ID : ' || EMP.EMP_ID);
+   DBMS_OUTPUT.PUT_LINE('EMP_NAME : ' || EMP.EMP_NAME);
+   DBMS_OUTPUT.PUT_LINE('DEPT_CODE : ' || EMP.EMP_NO);
+   DBMS_OUTPUT.PUT_LINE('SALARY : ' || EMP.SALARY);
+END;
+/ 
+
+-- 연봉을 구하는 PL/SQL 블럭 작성
+DECLARE
+  VEMP EMPLOYEE%ROWTYPE;
+  YSALARY NUMBER;
+BEGIN
+  SELECT E.*
+    INTO VEMP
+    FROM EMPLOYEE E
+   WHERE E.EMP_NAME = '&사원명';
+   -- 원래 가지고 있던 컬럼에 값을 넣어줄 땐
+   -- SELECT절에 있는 컬럼에 값을 넣어줄 때
+   IF(VEMP.BONUS IS NULL) THEN YSALARY := VEMP.SALARY * 12;
+   -- 컬럼에 값을 넣어줄 때는 := 사용
+   ELSIF(VEMP.BONUS IS NOT NULL) THEN YSALARY := (VEMP.SALARY + (VEMP.SALARY * VEMP.BONUS)) * 12 ;
+   END IF;
+   
+   DBMS_OUTPUT.PUT_LINE(VEMP.EMP_ID || '             '
+                                    || VEMP.EMP_NAME || '             '
+                                    || TO_CHAR(YSALARY,'L999,999,999'));
+END;
+/
+
+-- 점수를 입력받아 SCORE 변수에 저장하고
+-- 90점 이상은 'A', 80점 이상은 'B', 70점 이상은 'C'
+-- 60점 이상은 'D', 60점 미만은 'F'로 조건 처리하여
+-- GRADE 변수에 저장하여
+-- '당신의 점수는 90점 이고, 학점은 A학점 입니다.' 형태로 출력하세요.
+
+-- DECLARE 변수 선언
+-- BEGIN END; 안에 조회, 입력, 출력
+
+DECLARE
+  SCORE NUMBER;
+  GRADE VARCHAR2(2);
+BEGIN
+  SCORE := '&SCORE';
+  -- 새로 선언한 변수에 값을 입력받음
+  -- 특정 테이블의 컬럼에 실제값을 대입(=)하는 게 아니라, 내가 DECLARE에서 선언한 변수에 값을 넣어주므로 := 이용
+  IF SCORE >= 90 THEN GRADE := 'A';
+  ELSIF SCORE >= 80 THEN GRADE := 'B';
+  ELSIF SCORE >= 70 THEN GRADE := 'C';
+  ELSIF SCORE >= 60 THEN GRADE := 'D';
+  ELSE GRADE := 'F';
+  -- 위애서의 조건에 모두 부합하지 않는다면 ELSE로 작성
+  END IF;
+  -- ()가 없으므로 IF 다음엔 END IF로 마무리
+  
+  DBMS_OUTPUT.PUT_LINE('당신의 점수는 ' || SCORE || '점 이고, 학점은 ' || GRADE || '학점 입니다.');
+  
+END;
+/
+
+
+DECLARE
+  VEMPNO EMPLOYEE.EMP_ID%TYPE;
+  VENAME EMPLOYEE.EMP_NAME%TYPE;
+  VDEPTNO EMPLOYEE.DEPT_CODE%TYPE;
+  VDNAME VARCHAR2(20) := NULL;
+  -- VDNAME에 조회한 DEPT_CODE 넣음
+BEGIN
+  -- 사번을 입력받아서 사번, 이름, 부서코드
+  -- 조건문을 통해서 각 부서의 이름을 추가해주세요
+  SELECT E.EMP_ID
+       , E.EMP_NAME
+       , E.DEPT_CODE
+  INTO VEMPNO
+       , VENAME
+       , VDEPTNO
+  FROM EMPLOYEE E
+ WHERE E.EMP_ID = '&사번';
+ 
+ -- PL/SQL에서 조건문 사용 가능 
+  IF(VDEPTNO = 'D1') THEN  VDNAME := '인사관리부';
+  END IF;
+  
+  IF(VDEPTNO = 'D2') THEN  VDNAME := '회계관리부';
+  END IF;
+  
+  IF(VDEPTNO = 'D3') THEN  VDNAME := '마케팅부';
+  END IF;
+  
+  IF(VDEPTNO = 'D4') THEN  VDNAME := '국내영업부';
+  END IF;
+  
+  IF(VDEPTNO = 'D5') THEN  VDNAME := '해외영업1부';
+  END IF;
+  
+  IF(VDEPTNO = 'D6') THEN  VDNAME := '해외영업2부';
+  END IF;
+  
+  IF(VDEPTNO = 'D7') THEN  VDNAME := '해외영업3부';
+  END IF;
+  
+  IF(VDEPTNO = 'D8') THEN  VDNAME := '기술지원부';
+  END IF;
+  
+  IF(VDEPTNO = 'D9') THEN  VDNAME := '총무부';
+  END IF;
+  
+  DBMS_OUTPUT.PUT_LINE('사번      이름     부서명');
+  DBMS_OUTPUT.PUT_LINE('----------------------');
+  DBMS_OUTPUT.PUT_LINE(VEMPNO || '     ' || VENAME || '     ' || VDNAME);
+  
+END;
+/
+
+
+SELECT * FROM DEPARTMENT;
+
+
+DECLARE
+  VEMPNO EMPLOYEE.EMP_ID%TYPE;
+  VENAME EMPLOYEE.EMP_NAME%TYPE;
+  VDEPTNO EMPLOYEE.DEPT_CODE%TYPE;
+  VDNAME VARCHAR2(20) := NULL;
+BEGIN
+  SELECT E.EMP_ID
+       , E.EMP_NAME
+       , E.DEPT_CODE
+  INTO VEMPNO
+       , VENAME
+       , VDEPTNO
+  FROM EMPLOYEE E
+ WHERE E.EMP_ID = '&사번';
+  
+  VDNAME := CASE VDEPTNO
+              WHEN 'D1' THEN '인사관리부'
+              WHEN 'D2' THEN '회계관리부'
+              WHEN 'D3' THEN '마케팅부'
+              WHEN 'D4' THEN '국내영업부'
+              WHEN 'D5' THEN '해외영업1부'
+              WHEN 'D6' THEN '해외영업2부'
+              WHEN 'D7' THEN '해외영업3부'
+              WHEN 'D8' THEN '기술지원부'
+              WHEN 'D9' THEN '총무부'
+            END;
+            -- CASE WHEN을 통해 위에 IF ELSIF의 반복을 줄일 수 있음
+            -- CASE WHEN THEN "END"로 케이스문을 끝내야
+            
+    DBMS_OUTPUT.PUT_LINE('사번      이름     부서명');
+    DBMS_OUTPUT.PUT_LINE('----------------------');
+    DBMS_OUTPUT.PUT_LINE(VEMPNO || '     ' || VENAME || '     ' || VDNAME);
+  
+  
+END;
+/
+
+
+-- 반복문 LOOP -> END LOOP;
+DECLARE
+  N NUMBER := 1;
+BEGIN
+  LOOP
+    DBMS_OUTPUT.PUT_LINE(N);
+    N := N + 1;
+    -- 한번 출력할 때마다 1 더하기
+    IF N > 5 THEN EXIT;
+    -- 반복문 나가기
+    END IF;
+    -- IF -> END IF
+  END LOOP;
+END;
+/
+
+
+
 
 
 
