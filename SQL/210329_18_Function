@@ -5,6 +5,7 @@ CREATE OR REPLACE FUNCTION BONUS_CALC
 (
   V_EMP EMPLOYEE.EMP_ID%TYPE
 )
+-- 매개변수
 RETURN NUMBER
 IS
    V_SAL EMPLOYEE.SALARY%TYPE;
@@ -17,9 +18,11 @@ BEGIN
        , V_BONUS
     FROM EMPLOYEE E
    WHERE E.EMP_ID = V_EMP;
+-- 내부적인 식들
 
    CALC_SAL := (V_SAL + (V_SAL * V_BONUS)) * 12;
    -- 보너스를 포함한 연봉
+   -- CALC_SAL에 넣어줄 거다
    
    RETURN CALC_SAL;
 END;
@@ -37,9 +40,11 @@ SELECT
      , E.EMP_NAME
      , BONUS_CALC(E.EMP_ID)
        -- 매개변수로 EMP_ID를 넣어줌 (계산 결과인 연봉을 넣어줌)
-  FROM EMPLOYEE E
+       -- 3 2에서 채워진 값이 출력되는 것
+  FROM EMPLOYEE E 
+  --1
  WHERE BONUS_CALC(E.EMP_ID) > 30000000;
-
+  --2 (200, 201, 202,...) -> 조건에 부합하는 게 하나씩 채워짐
 -- PROCEDURE과 함수의 다른점
 -- 함수엔 매개변수를 넣으면 반환값 반환 but PROCEDURE은 특정 형식에 값을 넣어줘야 함
 
