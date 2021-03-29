@@ -1,0 +1,107 @@
+-- 프로시져 (PROCEDURE)
+-- PL / SQL문을 저장하는 객체이다.
+-- 필요할 때마다 복잡한 구문을 다시 입력할 필요 없이
+-- 호출을 통해서 간단히 실행시키기 위한 목적으로 사용됨
+CREATE TABLE EMP_DUP
+AS
+SELECT E.*
+  FROM EMPLOYEE E;
+
+SELECT
+       ED.*
+  FROM EMP_DUP ED;
+  
+-- 프로시져 생성
+-- 매개변수가 없는 메소드를 호출
+CREATE OR REPLACE PROCEDURE DEL_ALL_EMP
+IS
+BEGIN
+  DELETE
+    FROM EMP_DUP;
+  COMMIT;
+END;
+/
+
+-- 프로시져 실행(2)
+EXECUTE DEL_ALL_EMP;
+EXEC DEL_ALL_EMP;
+
+SELECT
+       ED.*
+  FROM EMP_DUP ED;
+  
+ROLLBACK;
+
+-- 프로시져를 관리하는 데이터 딕셔너리
+SELECT
+       US.*
+  FROM USER_SOURCE US;
+
+-- 매개변수 있는 프로시져
+CREATE OR REPLACE PROCEDURE DEL_EMP_ID
+(
+  V_EMP_ID EMPLOYEE.EMP_ID%TYPE
+  -- 해당 변수는 EMPLOYEE 테이블의 EMP_ID의 데이터 타입을 그대로 물려받는다
+  -- 궁금하면 DESC EMPLOYEE 써주기
+)
+IS 
+BEGIN
+  DELETE
+    FROM EMPLOYEE E
+   WHERE E.EMP_ID = V_EMP_ID;
+END;
+/
+
+-- 프로시져에 매개변수 값 넣어줌
+EXEC DEL_EMP_ID('&EMP_ID');
+
+SELECT
+       E.*
+  FROM EMPLOYEE E;
+
+ROLLBACK;
+
+-- IN/OUT 매개변수 있는 프로시져
+CREATE OR REPLACE PROCEDURE SELECT_EMP_ID
+(
+  V_EMP_ID IN EMPLOYEE.EMP_ID%TYPE,
+  -- 입력받는 값에 대한 변수 
+  -- 매개변수
+  V_EMP_NAME OUT EMPLOYEE.EMP_NAME%TYPE,
+  V_SALARY OUT EMPLOYEE.SALARY%TYPE,
+  V_BONUS OUT EMPLOYEE.BONUS%TYPE
+  -- SELECT에서의 결과값을 하나씩 넣어줌
+)
+IS
+BEGIN
+ SELECT E.EMP_NAME
+      , E.SALARY
+      , NVL(BONUS, 0)
+   INTO V_EMP_NAME
+      , V_SALARY
+      , V_BONUS
+   FROM EMPLOYEE E
+  WHERE E.EMP_ID = V_EMP_ID;
+  -- 직접 변수에 값을 넣어주는 게 아니므로 :=가 아님
+END;
+/
+
+-- 프로시져 밖에 임시변수를 선언하고 프로시져에서 나온 값을 넣어주어야 함(자바에서 리턴의 역할)
+VARIABLE VAR_EMP_NAME VARCHAR2(30);
+VARIABLE VAR_SALARY NUMBER;
+VARIABLE VAR_BONUS NUMBER;
+
+-- 내가 조회하려고 하는 값, 이름, 급여, 샐러리를 위의 임시변수로 넣어줘야 함
+EXEC SELECT_EMP_ID(200,:VAR_EMP_NAME,:VAR_SALARY,:VAR_BONUS);
+
+PRINT VAR_EMP_NAME;
+PRINT VAR_SALARY;
+PRINT VAR_BONUS;
+
+-- 출력을 하기 위해 프린트에 대한 내용을 SET AUTOPRINT ON으로 해주면 자동으로 출력해줌 (96~99 없어도) 
+SET AUTOPRINT ON;  
+  
+  
+  
+  
+  
