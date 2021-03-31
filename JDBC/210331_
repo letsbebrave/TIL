@@ -1,0 +1,58 @@
+package com.greedy.section01.connection;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class Application1 {
+
+	public static void main(String[] args) {
+		/* DB 접속을 위한 Connection 인스턴스 생성을 위한
+		 * 래퍼런스 변수 선언
+		 * 나중에 finally 블럭에서 사용하기 위해 try 블럭 밖에 선언
+		 */
+		
+		Connection con = null;
+		
+		// Statement가 PreparedStatement에 상속해줌  -> 다형성 -> Statement에만 넣어주면 PreparedStatement도 생김
+		
+
+		 try {
+			 
+			/* 사용할 드라이버 등록 */
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			// 이 클래스 내부에서oracle.jdbc.driver.OracleDriver를 찾아가도록 드라이버 등록
+			// 커넥션 객체를 만들고 DriverManager로 연결해줘야
+			
+			/* DriverManager를 이용해 Connection 생성 */
+			con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","EMPLOYEE","EMPLOYEE");
+			// 연결값을 이용해서 DB에 접근하도록 해줌
+			// thin타입의 oracle에 접속 
+			// oracle 전용 포트인 1521도 작성
+			
+			// getConnection static으로 고정해두고 공유해서 쓰는 싱글톤
+			
+			System.out.println("con : " + con);
+			// con은 연결 객체의 주소값
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// 연결 객체 종료
+			if(con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+		 
+		
+	}
+
+}
